@@ -1,0 +1,30 @@
+{
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "nodemon src/server.ts --exec ts-node src/server.ts",
+    "dev2": "nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts",
+    "lint": "eslint 'src/**/*.ts'"
+  },
+  "dependencies": {
+    "http": "^0.0.1-security",
+    "ioredis": "^5.8.1",
+    "redis": "^5.8.3",
+    "websocket": "^1.0.35",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.9.0",
+    "@types/nodemon": "^1.19.6",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.38.0",
+    "express": "^5.1.0",
+    "install": "^0.13.0",
+    "nodemon": "^3.1.10",
+    "npm": "^11.6.2",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
