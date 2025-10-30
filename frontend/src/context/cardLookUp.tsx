@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useState, type ReactNode } from "react";
-import type { CardStats } from "../models/game.ts";
+import type { CardStats, CardUID } from "../models/game.ts";
 import axios from 'axios';
 
-type CardLookUpMap = Record<number, CardStats>; // or whatever your key/value types are
+type CardLookUpMap = Record<CardUID, CardStats>; // or whatever your key/value types are
 
 interface CardLookUpContextType {
   data: CardLookUpMap;
-  setValue: (key: number) => void;
+  setValue: (key: CardUID) => void;
 }
 
-async function fetchCard(cardUid: number) {
+async function fetchCard(cardUid: CardUID) {
   let result = await new Promise((resolve, reject) => {
     axios.get(`https://admin.starwarsunlimited.com/api/card/${cardUid}`).then((res: any) => {
       resolve({
@@ -44,7 +44,7 @@ async function fetchCard(cardUid: number) {
 
 }
 
-async function createCard(cardUid: number): Promise<CardStats> {
+async function createCard(cardUid: CardUID): Promise<CardStats> {
   let data: any = await fetchCard(cardUid)
   data = data.data.data
   console.log("data", data)
@@ -66,7 +66,7 @@ const CardLookUpContext = createContext<CardLookUpContextType | undefined>(undef
 export const CardLookUpProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<CardLookUpMap>({});
 
-  const setValue = (key: number) => {
+  const setValue = (key: CardUID) => {
     createCard(key).then((result: CardStats) =>
       setData(prev => ({ ...prev, [key]: result }))
     );

@@ -55,10 +55,16 @@ export default function Home() {
         Click Me to change Socket Url
       </button>
       <button
-        onClick={() => handleClickSendMessage("jello")}
+        onClick={() => handleClickSendMessage("import deck")}
         disabled={readyState !== ReadyState.OPEN}
       >
-        Click Me to send 'Hello'
+        Click Me to send 'import deck'
+      </button>
+      <button
+        onClick={() => handleClickSendMessage("Draw Card:0")}
+        disabled={readyState !== ReadyState.OPEN}
+      >
+        Draw Card
       </button>
       <button
         onClick={() => handleClickSendMessage("restart")}

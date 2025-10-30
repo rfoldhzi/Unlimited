@@ -4,6 +4,7 @@ import Image from "../../image/image.js"
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Hand.css"
 import type { CardActive, CardUID, CardStats } from '../../models/game.js';
+import Card from '../card/Card.tsx';
 
 interface Props {
     onSend?: any
@@ -21,31 +22,42 @@ export default function Hand({ onSend, lastMessage }: Props) {
 
 
   if (lastMessage && lastMessage.charAt(0) == "{") {
-    let handList: CardStats[] = []
     let game = JSON.parse(lastMessage)
-    game.players["0"].hand.forEach((element: CardUID) => {
-      if (data[element]) {
-        if (data[element]?.imgURL) {
-          handList.push(data[element])
-        }
-      } else {
-        setValue(element)
-      }
-    });
     return (
-    <div className="hand-container">
-      {handList.map((x: CardStats, i: number) => {
-        return (<div className='b'>
-        <img onClick={() => onSend('Play Card:0:'+x.cardUid)}
-          src={x.imgURL}
-          alt="card" 
-          className="a"
-
-        ></img>
-        </div>)
-      })}
-    </div>
-  );
+      <div className="hand-container">
+      {game.players["0"].hand.map((x: CardUID, i: number) => {
+          return (<div className='b'>
+          <Card 
+            clickFunction={() => onSend('Play Card:0:' + x)} card={x}            
+          ></Card>
+          </div>)
+        })}
+      </div>
+    )
+    // let handList: CardStats[] = []
+    // game.players["0"].hand.forEach((element: CardUID) => {
+    //   if (data[element]) {
+    //     if (data[element]?.imgURL) {
+    //       handList.push(data[element])
+    //     }
+    //   } else {
+    //     setValue(element)
+    //   }
+    // });
+    // return (
+    // <div className="hand-container">
+    //   {handList.map((x: CardStats, i: number) => {
+    //     return (<div className='b'>
+    //     <img onClick={() => onSend('Play Card:0:'+x.cardUid)}
+    //       src={x.imgURL}
+    //       alt="card" 
+    //       className="a"
+          
+    //     ></img>
+    //     </div>)
+    //   })}
+    // </div>
+    // );
   }
 
   console.log("last Message", lastMessage)

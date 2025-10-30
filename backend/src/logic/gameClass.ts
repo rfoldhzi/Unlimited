@@ -14,8 +14,19 @@ export class GameClass implements Game {
         this.initiative = data.initiative
     }
 
+    public async drawCard(playerId: PlayerID) {
+        let player = this.players[playerId]!
+        let cardUid = player.deck.pop() as CardUID // Draw from the end of the list
+        player.hand.push(cardUid)
+    }
+
     public async playCard(cardUid: CardUID, playerId: PlayerID) {
+        console.log("playCard1")
         let card = await createCard(cardUid)
+        if (card == null) {
+            return
+        }
+        console.log("playCard2")
         card.ready = false;
         card.ownerID = playerId;
 

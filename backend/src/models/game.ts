@@ -11,15 +11,15 @@ export enum Arena {
     SPACE,
 }
 
-export type CardUID = number;
+export type CardUID = string;
 export type PlayerID = string;
 
 export interface CardBasic {
     cardID: number,
-    cardUid: number, // DB version of id
+    cardUid: CardUID, // DB version of id
 }
 
-export interface CardResource {
+export interface CardResource extends CardBasic {
     ownerID: PlayerID,
     ready: boolean,
 }
@@ -32,11 +32,11 @@ export interface CardStats extends CardBasic {
     aspectCost: Aspect[],
     imgURL?: string,
     arena?: Arena,
+    ownerID: PlayerID,
 }
 
 export interface CardActive extends CardStats {
     // Changing things
-    ownerID: PlayerID,
     damage: number,
     ready: boolean,
 }

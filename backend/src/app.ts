@@ -1,7 +1,7 @@
 import express from 'express';
 import itemRoutes from './routes/itemRoutes';
 import { errorHandler } from './middlewares/errorHandler';
-import { sampleGame } from './logic/gameHandler';
+import { importDeck, sampleGame } from './logic/gameHandler';
 import { GameClass } from './logic/gameClass';
 
 const app = express();
@@ -23,6 +23,15 @@ wss.on('connection', (ws: any) => {
         } else if (message == "restart") {
             let game = await sampleGame(true)
             ws.send(JSON.stringify(game))
+        } else if (message == "import deck") {
+            let game = await sampleGame()
+            game!.players["0"]!.deck = (await importDeck("", true))!
+            game!.players["0"]!.hand = []
+            let gameClass = new GameClass(game!)
+            for (let i=0; i<6; i++) {
+                gameClass.drawCard("0")
+            }
+            ws.send(JSON.stringify(gameClass))
         } else {
             let split = message.toString().split(":")
             if (split[0] == "Play Card") {
@@ -32,11 +41,20 @@ wss.on('connection', (ws: any) => {
                 let game = await sampleGame()
                 console.log("game", game)
                 let gameClass = new GameClass(game!)
-                await gameClass.playCard(Number(cardUid), player)
+                console.log("app1")
+                await gameClass.playCard(cardUid, player)
+                console.log("app2")
                 console.log("game2", game)
                 console.log("game2.hand", game!.players['0']!.hand)
                 console.log("gameClass", gameClass)
                 console.log("gameClass.hand", gameClass!.players['0']!.hand)
+                ws.send(JSON.stringify(gameClass))
+            } else if (split[0] == "Draw Card") {
+                let player = split[1]!
+                
+                let game = await sampleGame()
+                let gameClass = new GameClass(game!)
+                await gameClass.drawCard(player)
                 ws.send(JSON.stringify(gameClass))
             } else {
                 // Echo message back to the client
