@@ -4,6 +4,7 @@ import Image from "../../image/image.js"
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Arena.css"
 import type { CardActive, CardUID, CardStats } from '../../models/game.ts';
+import { PlayerName } from '../hand/Hand2.tsx';
 
 interface Props {
     onSend?: any
@@ -25,7 +26,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
     let spaceArena: CardStats[] = []
     let game = JSON.parse(lastMessage)
     console.log("game2", game)
-    game.players["0"].groundArena.forEach((element: CardActive) => {
+    game.players[PlayerName].groundArena.forEach((element: CardActive) => {
       if (data[element.cardUid]) {
         if (data[element.cardUid]?.imgURL) {
           groundArena.push(data[element.cardUid]!)
@@ -34,7 +35,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
         setValue(element.cardUid)
       }
     });
-    game.players["0"].spaceArena.forEach((element: CardActive) => {
+    game.players[PlayerName].spaceArena.forEach((element: CardActive) => {
       if (data[element.cardUid]) {
         if (data[element.cardUid]?.imgURL) {
           spaceArena.push(data[element.cardUid]!)

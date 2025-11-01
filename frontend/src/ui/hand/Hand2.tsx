@@ -11,7 +11,7 @@ import useWebSocket from "react-use-websocket"
 
 const useWs = (useWebSocket as any).default as typeof useWebSocket
 
-
+export let PlayerName = "Default"
 
 // console.log(ws);
 // export default function Home() {
@@ -25,6 +25,8 @@ export default function Home() {
   const [messageHistory, setMessageHistory] = useState([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+
+  PlayerName = new URLSearchParams(window.location.search).get("player") || "Default"
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -55,13 +57,13 @@ export default function Home() {
         Click Me to change Socket Url
       </button>
       <button
-        onClick={() => handleClickSendMessage("import deck")}
+        onClick={() => handleClickSendMessage(`import deck:${PlayerName}`)}
         disabled={readyState !== ReadyState.OPEN}
       >
         Click Me to send 'import deck'
       </button>
       <button
-        onClick={() => handleClickSendMessage("Draw Card:0")}
+        onClick={() => handleClickSendMessage(`Draw Card:${PlayerName}`)}
         disabled={readyState !== ReadyState.OPEN}
       >
         Draw Card

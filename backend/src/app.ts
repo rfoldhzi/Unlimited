@@ -23,22 +23,13 @@ wss.on('connection', (ws: any) => {
         } else if (message == "restart") {
             let game = await sampleGame(true)
             ws.send(JSON.stringify(game))
-        } else if (message == "import deck") {
-            let game = await sampleGame()
-            game!.players["0"]!.deck = (await importDeck("", true))!
-            game!.players["0"]!.hand = []
-            let gameClass = new GameClass(game!)
-            for (let i=0; i<6; i++) {
-                gameClass.drawCard("0")
-            }
-            ws.send(JSON.stringify(gameClass))
         } else {
             let split = message.toString().split(":")
             if (split[0] == "Play Card") {
                 let player = split[1]!
                 let cardUid = split[2]!
 
-                let game = await sampleGame()
+                let game = await sampleGame(false, player)
                 console.log("game", game)
                 let gameClass = new GameClass(game!)
                 console.log("app1")
@@ -49,10 +40,21 @@ wss.on('connection', (ws: any) => {
                 console.log("gameClass", gameClass)
                 console.log("gameClass.hand", gameClass!.players['0']!.hand)
                 ws.send(JSON.stringify(gameClass))
+            } else if (split[0] == "import deck") {
+                let player = split[1]!
+                let game = await sampleGame(false, player)
+
+                game!.players[player]!.deck = (await importDeck("", true))!
+                game!.players[player]!.hand = []
+                let gameClass = new GameClass(game!)
+                for (let i=0; i<6; i++) {
+                    gameClass.drawCard(player)
+                }
+                ws.send(JSON.stringify(gameClass))
             } else if (split[0] == "Draw Card") {
                 let player = split[1]!
                 
-                let game = await sampleGame()
+                let game = await sampleGame(false, player)
                 let gameClass = new GameClass(game!)
                 await gameClass.drawCard(player)
                 ws.send(JSON.stringify(gameClass))

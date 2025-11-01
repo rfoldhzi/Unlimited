@@ -12,15 +12,17 @@ export enum Arena {
 }
 
 export type CardUID = string;
+export type CardID = string;
 export type PlayerID = string;
 
 export interface CardBasic {
-    cardID: number,
+    cardID: CardID,
     cardUid: CardUID, // DB version of id
 }
 
 export interface CardResource extends CardBasic {
     ownerID: PlayerID,
+    controllerID: PlayerID,
     ready: boolean,
 }
 
@@ -32,13 +34,14 @@ export interface CardStats extends CardBasic {
     aspectCost: Aspect[],
     imgURL?: string,
     arena?: Arena,
-    ownerID: PlayerID,
 }
 
 export interface CardActive extends CardStats {
     // Changing things
     damage: number,
     ready: boolean,
+    ownerID: PlayerID,
+    controllerID: PlayerID,
 }
 
 export interface Leader extends CardActive {

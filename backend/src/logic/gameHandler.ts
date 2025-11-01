@@ -1,7 +1,10 @@
 import { Arena, CardActive, CardUID, Game, games, PlayerState } from "../models/game"
 const https = require('https');
 
-let deckCode = "U2FsdGVkX18MXyRr/j5zacb6LjmsLpjpSpejheIax2KNmzVL0LAW0so+acubQrt9V3mbBrLwrsYE7akB4rJBgFdIj2Rnm7jZ5iqrz7BGDvwYf7Ms/CMW+NduAiRSTEWZhrmC/iGteScoq0snlU57jhhxcuZcuLuBeLrEGX+40hOMVW5J0AhpIF7KVYHQ/WDj4C3TYVJ/TZa8RIBN5wMP+UezTA9dFSM0uE4HwCFcDkDizHh3Vdwrt8mGxGIErF/egJdeasllAfWTJeCFPH48GZoWbffkJTQNsYA4ch6MGHAjOXGLC2Xi7h5spDaj2fw5"
+let deckCodes = [
+    "U2FsdGVkX18MXyRr/j5zacb6LjmsLpjpSpejheIax2KNmzVL0LAW0so+acubQrt9V3mbBrLwrsYE7akB4rJBgFdIj2Rnm7jZ5iqrz7BGDvwYf7Ms/CMW+NduAiRSTEWZhrmC/iGteScoq0snlU57jhhxcuZcuLuBeLrEGX+40hOMVW5J0AhpIF7KVYHQ/WDj4C3TYVJ/TZa8RIBN5wMP+UezTA9dFSM0uE4HwCFcDkDizHh3Vdwrt8mGxGIErF/egJdeasllAfWTJeCFPH48GZoWbffkJTQNsYA4ch6MGHAjOXGLC2Xi7h5spDaj2fw5",
+    "U2FsdGVkX1/SRuccWp65qiVOVoN0zA05HGMMU4ReY72AJwZ7KzagONJsZaG++40YIjd6+XWQQhH0lmZeTOQRVP5sANOR4VMsKZrNGf2RUeRXY1aPJUvLXBUnya4C+0C5l7FoyE5pSG0/Skj6qtObBRi1gQD9/d9yumHiGBzDXZ/22GVeXFpxDWJaOWoamUyTAWvKJAr6iloX9M34bexLsRztTux/7zturL5TUKQ3MiFcDULc8eXvd5aFhbJ5F37cI6rLDoypGTcw5viICbMTmud6gDRYDUdSGi2GHROLTP458sbUk70azdnbAt5ofTLNcbGz3AtgZQzhh7H/9Z713xzqxXZThWnv/n/x3AjOppDabvxUyACn9/39mHXudltO",
+]
 
 async function fetchDeck(code: string) {
     let result = await new Promise((resolve, reject) => {
@@ -43,7 +46,8 @@ async function fetchDeck(code: string) {
             });
         })
 
-        req.write('{"code":"U2FsdGVkX18MXyRr/j5zacb6LjmsLpjpSpejheIax2KNmzVL0LAW0so+acubQrt9V3mbBrLwrsYE7akB4rJBgFdIj2Rnm7jZ5iqrz7BGDvwYf7Ms/CMW+NduAiRSTEWZhrmC/iGteScoq0snlU57jhhxcuZcuLuBeLrEGX+40hOMVW5J0AhpIF7KVYHQ/WDj4C3TYVJ/TZa8RIBN5wMP+UezTA9dFSM0uE4HwCFcDkDizHh3Vdwrt8mGxGIErF/egJdeasllAfWTJeCFPH48GZoWbffkJTQNsYA4ch6MGHAjOXGLC2Xi7h5spDaj2fw5"}');
+        let deckCode = deckCodes[Math.floor(Math.random() * deckCodes.length)];
+        req.write(`{"code":"${deckCode}"}`);
         req.end();
 
     })
@@ -115,7 +119,7 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
         return null
     }
     let card: CardActive = {
-        cardID: 0,
+        cardID: "0",
         cardUid: cardUid,
         name: data.attributes.title,
         hp: data.attributes.hp,
@@ -125,7 +129,8 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
         ownerID: "",
         damage: 0,
         ready: true,
-        imgURL: data.attributes.artFront.data.attributes.formats.card.url
+        imgURL: data.attributes.artFront.data.attributes.formats.card.url,
+        controllerID: "0"
     }
     if (data.attributes.arenas.data.find((item: any) => item.attributes.name == "Ground")) {
         card.arena = Arena.GROUND
@@ -134,6 +139,20 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
         card.arena = Arena.SPACE
     }
     return card
+}
+
+export const createPlayer = (player: string): PlayerState => {
+    let player1: PlayerState = {
+        playerID: player,
+        hand: ["2383321298", "6867378216", "7227136692", "3347454174", "9655836052", "2151832252", "9127322562"],
+        resources: [],
+        deck: [],
+        leader: [],
+        groundArena: [],
+        spaceArena: [],
+        discard: []
+    }
+    return player1
 }
 
 export const createSampleGame = async (): Promise<Game> => {
@@ -162,10 +181,13 @@ export const createSampleGame = async (): Promise<Game> => {
     return game
 }
 
-export const sampleGame = async (newGame?: boolean) => {
+export const sampleGame = async (newGame?: boolean, player?: string) => {
     // console.log("HERE2", games)
     if (games && games.length > 0 && !newGame) {
         // console.log("HERE3", games)
+        if (player && !games[0]!.players[player]) {
+            games[0]!.players[player] = createPlayer(player)
+        }
         return games[0]
     }
     if (newGame) {
@@ -174,6 +196,10 @@ export const sampleGame = async (newGame?: boolean) => {
     let game = await createSampleGame();
     
     (games as Game[]).push(game)
+
+    if (player && !game.players[player]) {
+        game.players[player] = createPlayer(player)
+    }
     // console.log("game",game)
 
     return game 

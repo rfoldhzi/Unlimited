@@ -5,6 +5,7 @@ import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Hand.css"
 import type { CardActive, CardUID, CardStats } from '../../models/game.js';
 import Card from '../card/Card.tsx';
+import { PlayerName } from './Hand2.tsx';
 
 interface Props {
     onSend?: any
@@ -25,10 +26,10 @@ export default function Hand({ onSend, lastMessage }: Props) {
     let game = JSON.parse(lastMessage)
     return (
       <div className="hand-container">
-      {game.players["0"].hand.map((x: CardUID, i: number) => {
+      {game.players[PlayerName].hand.map((x: CardUID, i: number) => {
           return (<div className='b'>
           <Card 
-            clickFunction={() => onSend('Play Card:0:' + x)} card={x}            
+            clickFunction={() => onSend(`Play Card:${PlayerName}:` + x)} card={x}            
           ></Card>
           </div>)
         })}
