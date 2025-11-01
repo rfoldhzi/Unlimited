@@ -22,6 +22,10 @@
     border: none;
 }
 
+.card-color-Heroism {
+    background: radial-gradient(ellipse at right top, #f6f2dade 0%, #151419 47%, #151419 100%);
+}
+
 .card-color-Villainy {
     background: radial-gradient(ellipse at right top, #9174a8de 0%, #151419 47%, #151419 100%);
 }
@@ -34,6 +38,14 @@
     background: radial-gradient(ellipse at right top, #3b9557de 0%, #151419 47%, #151419 100%);
 }
 
+
+.card-color-Vigilance {
+    background: radial-gradient(ellipse at right top, #1f7eafde 0%, #151419 47%, #151419 100%);
+}
+
+.card-color-Cunning {
+    background: radial-gradient(ellipse at right top, #fdd867de 0%, #151419 47%, #151419 100%);
+}
 
 .preview-card {
     max-height: 70vh;
