@@ -1,10 +1,10 @@
 export enum Aspect {
-    VIGILANCE,
-    COMMAND,
-    AGGRESSION,
-    CUNNING,
-    HEROISM,
-    VILLANY,
+    VIGILANCE = "Vigilance",
+    COMMAND = "Command",
+    AGGRESSION = "Aggression",
+    CUNNING = "Cunning",
+    HEROISM = "Heroism",
+    VILLANY = "Villany",
 }
 export enum Arena {
     GROUND,

@@ -16,36 +16,23 @@ async function fetchCard(cardUid: CardUID) {
         statusCode: res.statusCode,
         data: res.data
       });
-      // let output = '';
-      // res.setEncoding('utf8');
-
-      // res.on('data', function (chunk: any) {
-      //     output += chunk;
-      // });
-
-      // res.on('end', () => {
-      //     try {
-      //         let obj = JSON.parse(output);
-      //         // console.log('rest::', obj);
-      //         resolve({
-      //             statusCode: res.statusCode,
-      //             data: obj
-      //         });
-      //     }
-      //     catch (err) {
-      //         console.error('rest::end', err);
-      //         // reject(err);
-      //     }
-      // });
-    })
+    }).catch(error => {
+      reject();
+    });
 
   })
   return result
 
 }
 
-async function createCard(cardUid: CardUID): Promise<CardStats> {
-  let data: any = await fetchCard(cardUid)
+async function createCard(cardUid: CardUID): Promise<CardStats | null> {
+  let data: any = null
+  data = await fetchCard(cardUid).catch(error => {
+    return null
+  });
+  if (data == null) {
+    return null
+  }
   data = data.data.data
   console.log("data", data)
   let card: CardStats = {
@@ -55,7 +42,7 @@ async function createCard(cardUid: CardUID): Promise<CardStats> {
     hp: data.attributes.hp,
     power: data.attributes.pwoer,
     cost: data.attributes.cost,
-    aspectCost: [],
+    aspectCost: data.attributes.aspects.data.map((item: any) => item.attributes.name),
     imgURL: data.attributes.artFront.data.attributes.formats.card.url
   }
   return card
@@ -67,8 +54,10 @@ export const CardLookUpProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<CardLookUpMap>({});
 
   const setValue = (key: CardUID) => {
-    createCard(key).then((result: CardStats) =>
+    createCard(key).then((result: CardStats | null) => {
+      if (result == null) return
       setData(prev => ({ ...prev, [key]: result }))
+    }
     );
   };
 

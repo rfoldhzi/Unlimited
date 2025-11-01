@@ -1,0 +1,41 @@
+.a {
+    /* width: 100px; */
+    /* flex-shrink: 1; */
+    /* flex: 1 1 0; */
+    /* flex-basis: 150px;
+    max-width: 150px;
+    display: inline-flex;
+    box-sizing: border-box; */
+    width: 100%;
+    max-width: 100px;
+    max-height: 100%;
+    /* height: 100%; */
+}
+
+.card-modal {
+    background: radial-gradient(ellipse at right top, #777777de 0%, #151419 47%, #151419 100%);
+    /* opacity: 0.95; */
+    transition: opacity 0.25s ease-in;
+    box-shadow: 0.063em 0.75em 1.563em rgba(0, 0, 0, 0.78);
+    border-radius: 1rem;
+    outline: none;
+    border: none;
+}
+
+.card-color-Villainy {
+    background: radial-gradient(ellipse at right top, #9174a8de 0%, #151419 47%, #151419 100%);
+}
+
+.card-color-Aggression {
+    background: radial-gradient(ellipse at right top, #a3403ade 0%, #151419 47%, #151419 100%);
+}
+
+.card-color-Command {
+    background: radial-gradient(ellipse at right top, #3b9557de 0%, #151419 47%, #151419 100%);
+}
+
+
+.preview-card {
+    max-height: 70vh;
+    width: auto;
+}
