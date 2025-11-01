@@ -19,33 +19,37 @@ export default function Card({ card, clickFunction }: Props) {
 
     if (typeof card === "string") {
         uid = card as CardUID
+        if (data[uid]) {
+            if (data[uid]?.imgURL) {
+                url = data[uid]?.imgURL!
+            }
+            if (data[uid]?.aspectCost) {
+                aspectColor = data[uid]?.aspectCost[0] || ""
+            }
+        } else {
+            if (uid) {
+                setValue(uid)
+            }
+            return (<div></div>)
+        }
+    } else {
+        url = card.imgURL!
+        aspectColor = card.aspectCost[0] || ""
     }
 
     // If card is CardActive, new check
 
-    if (data[uid]) {
-        if (data[uid]?.imgURL) {
-            url = data[uid]?.imgURL!
-        }
-        if (data[uid]?.aspectCost) {
-            aspectColor = data[uid]?.aspectCost[0] || ""
-        }
-    } else {
-        if (uid) {
-            setValue(uid)
-        }
-        return (<div></div>)
-    }
+
 
 
 
     return (
         <div className='b'>
             <img onClick={(event: any) => {
-                    console.log("event", event)
-                    // clickFunction()
-                    setIsOpen(true)
-                }}
+                console.log("event", event)
+                // clickFunction()
+                setIsOpen(true)
+            }}
                 onContextMenu={(event: any) => {
                     // event.preventDefault()
                     // setIsOpen(true)

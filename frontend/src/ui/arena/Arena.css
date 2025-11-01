@@ -8,12 +8,20 @@
     justify-content: center;
 }
 
+.flex-center {
+    justify-content: space-evenly;
+    display: flex;
+}
+
 .ground-arena {
     background-color: #3e663b;
     width: 50vw;
     left: 0;
     top: 20vh;
     height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .space-arena {
@@ -22,6 +30,9 @@
     right: 0;
     top: 20vh;
     height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .a {

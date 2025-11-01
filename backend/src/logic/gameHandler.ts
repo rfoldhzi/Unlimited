@@ -125,7 +125,7 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
         hp: data.attributes.hp,
         power: data.attributes.power,
         cost: data.attributes.cost,
-        aspectCost: [],
+        aspectCost: data.attributes.aspects.data.map((item: any) => item.attributes.name),
         ownerID: "",
         damage: 0,
         ready: true,
