@@ -12,7 +12,7 @@ export enum Arena {
 }
 
 export type CardUID = string;
-export type CardID = string;
+export type CardID = number;
 export type PlayerID = string;
 
 export interface CardBasic {
@@ -64,6 +64,7 @@ export interface Game {
     players: {[playerID: string] : PlayerState;}
     name: string;
     initiative: PlayerID;
+    cardCount: number,
 }
 
 export let games: Game[] = [];

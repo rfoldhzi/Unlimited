@@ -13,6 +13,8 @@ export default function Card({ card, clickFunction }: Props) {
     let url: string = ""
     let aspectColor: string = ""
     let uid: CardUID = ""
+    let damage: string = ""
+    let ready = true
 
     let [isOpen, setIsOpen] = useState(false)
     const { data, setValue } = useCardLookUp();
@@ -35,6 +37,10 @@ export default function Card({ card, clickFunction }: Props) {
     } else {
         url = card.imgURL!
         aspectColor = card.aspectCost[0] || ""
+        ready = card.ready
+        if (card.damage > 0) {
+            damage = String(card.damage)
+        }
     }
 
     // If card is CardActive, new check
@@ -45,6 +51,9 @@ export default function Card({ card, clickFunction }: Props) {
 
     return (
         <div className='b'>
+            <p className="damage-text">
+                {damage}
+            </p>
             <img onClick={(event: any) => {
                 console.log("event", event)
                 // clickFunction()
@@ -58,7 +67,7 @@ export default function Card({ card, clickFunction }: Props) {
                 }}
                 src={url}
                 alt="card"
-                className="a"
+                className={"a " + ( ready ? "" : "unready")}
             ></img>
             <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4">

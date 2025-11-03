@@ -40,6 +40,17 @@ wss.on('connection', (ws: any) => {
                 console.log("gameClass", gameClass)
                 console.log("gameClass.hand", gameClass!.players['0']!.hand)
                 ws.send(JSON.stringify(gameClass))
+            } else if (split[0] == "Attack Card") {
+                let playerID = split[1]!
+                let attackerID = split[2]!
+                let defenderrID = split[3]!
+
+                let game = await sampleGame(false, playerID)
+                console.log("game", game)
+                let gameClass = new GameClass(game!)
+                console.log("app1")
+                await gameClass.attackCard(playerID, attackerID, defenderrID)
+                ws.send(JSON.stringify(gameClass))
             } else if (split[0] == "import deck") {
                 let player = split[1]!
                 let game = await sampleGame(false, player)

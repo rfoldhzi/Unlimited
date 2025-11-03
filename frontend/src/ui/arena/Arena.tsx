@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 // @ts-ignore
 import Image from "../../image/image.js"
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
@@ -20,6 +20,20 @@ export default function Arena({ onSend, lastMessage }: Props) {
 
   const { data, setValue } = useCardLookUp();
 
+  const [cardSelected, selectCard ] = useState(null as CardActive | null);
+
+  let friendCardSelected = (card: CardActive) => {
+    selectCard(card)
+  }
+
+  let enemyCardSelected = (card: CardActive) => {
+    if (cardSelected) {
+      console.log(cardSelected, "atttacks", card)
+      console.log(`Attack Card:${PlayerName}:${cardSelected.cardID}:${card.cardID}`)
+      onSend(`Attack Card:${PlayerName}:${cardSelected.cardID}:${card.cardID}`)
+      selectCard(null)
+    }
+  }
 
 
   if (lastMessage && lastMessage.charAt(0) == "{") {
@@ -37,7 +51,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
                   {
                     game.players[playerName].groundArena.map((x: CardActive, i: number) => {
                       return (<div className='b'>
-                        <Card card={x} clickFunction={() => { }}></Card>
+                        <Card card={x} clickFunction={() => {enemyCardSelected(x)}}></Card>
                       </div>)
                     })
                   }
@@ -47,8 +61,8 @@ export default function Arena({ onSend, lastMessage }: Props) {
           }
           <div className='flex-center'>
             {game.players[PlayerName].groundArena.map((x: CardActive, i: number) => {
-              return (<div className='b'>
-                <Card card={x} clickFunction={() => { }}></Card>
+              return (<div className={'b '+ (cardSelected?.cardID == x.cardID ? 'selected': '')}>
+                <Card card={x} clickFunction={() => {friendCardSelected(x)}}></Card>
               </div>)
             })}
           </div>
@@ -63,7 +77,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
                   {
                     game.players[playerName].spaceArena.map((x: CardActive, i: number) => {
                       return (<div className='b'>
-                        <Card card={x} clickFunction={() => { }}></Card>
+                        <Card card={x} clickFunction={() => {enemyCardSelected(x)}}></Card>
                       </div>)
                     })
                   }
@@ -73,8 +87,8 @@ export default function Arena({ onSend, lastMessage }: Props) {
           }
           <div className='flex-center'>
             {game.players[PlayerName].spaceArena.map((x: CardActive, i: number) => {
-              return (<div className='b'>
-                <Card card={x} clickFunction={() => { }}></Card>
+              return (<div className={'b '+ (cardSelected?.cardID == x.cardID ? 'selected': '')}>
+                <Card card={x} clickFunction={() => {friendCardSelected(x)}}></Card>
               </div>)
             })}
           </div>

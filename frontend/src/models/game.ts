@@ -1,10 +1,10 @@
 export enum Aspect {
-    VIGILANCE = "Vigilance",
-    COMMAND = "Command",
-    AGGRESSION = "Aggression",
-    CUNNING = "Cunning",
-    HEROISM = "Heroism",
-    VILLANY = "Villany",
+    VIGILANCE,
+    COMMAND,
+    AGGRESSION,
+    CUNNING,
+    HEROISM,
+    VILLANY,
 }
 export enum Arena {
     GROUND,
@@ -12,15 +12,17 @@ export enum Arena {
 }
 
 export type CardUID = string;
+export type CardID = number;
 export type PlayerID = string;
 
 export interface CardBasic {
-    cardID: number,
+    cardID: CardID,
     cardUid: CardUID, // DB version of id
 }
 
 export interface CardResource extends CardBasic {
     ownerID: PlayerID,
+    controllerID: PlayerID,
     ready: boolean,
 }
 
@@ -38,6 +40,8 @@ export interface CardActive extends CardStats {
     // Changing things
     damage: number,
     ready: boolean,
+    ownerID: PlayerID,
+    controllerID: PlayerID,
 }
 
 export interface Leader extends CardActive {
@@ -60,6 +64,7 @@ export interface Game {
     players: {[playerID: string] : PlayerState;}
     name: string;
     initiative: PlayerID;
+    cardCount: number,
 }
 
 export let games: Game[] = [];

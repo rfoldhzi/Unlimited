@@ -119,7 +119,7 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
         return null
     }
     let card: CardActive = {
-        cardID: "0",
+        cardID: 0,
         cardUid: cardUid,
         name: data.attributes.title,
         hp: data.attributes.hp,
@@ -172,6 +172,7 @@ export const createSampleGame = async (): Promise<Game> => {
     }
     let game: Game = {
         gameID: 0,
+        cardCount: 0,
         players: {
             "0":player1
         },
