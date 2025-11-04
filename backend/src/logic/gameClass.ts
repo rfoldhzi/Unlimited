@@ -1,14 +1,15 @@
-import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive } from "../models/game";
+import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource } from "../models/game";
 import { createCard } from "./gameHandler";
 
 export class GameClass implements Game {
     gameID: number;
     players: { [playerID: string]: PlayerState; };
     name: string;
-    initiative: string;
+    initiative: PlayerID | null;
     cardCount: number;
-
     data: Game;
+    phase: Phase;
+    turn: PlayerID;
 
     public constructor(data: Game) {
         this.data = data
@@ -17,6 +18,8 @@ export class GameClass implements Game {
         this.name = data.name;
         this.initiative = data.initiative
         this.cardCount = data.cardCount
+        this.phase = data.phase;
+        this.turn = data.turn;
     }
 
     /**
@@ -122,7 +125,7 @@ export class GameClass implements Game {
         card.controllerID = playerId;
 
         this.data.cardCount += 1;
-        card.cardID = this.data.cardCount ;
+        card.cardID = this.data.cardCount;
 
         // find card in player's hand
         let player = this.players[playerId]!
@@ -142,5 +145,94 @@ export class GameClass implements Game {
         } else if (card.arena == Arena.SPACE) {
             player.spaceArena.push(card)
         }
+    }
+
+    public async regroup() {
+        this.data.phase = Phase.REGROUP
+        for (let playerID in this.players) {
+            let player = this.players[playerID]!
+            for (let c of player.groundArena) {
+                c.ready = true
+            }
+            for (let c of player.spaceArena) {
+                c.ready = true
+            }
+            this.drawCard(playerID);
+            player.cardsToResource = 1;
+        }
+    }   
+
+
+    public async checkStartActionPhase() {
+        let allPlayersFinished = true;
+        for (let playerID in this.players) {
+            let player = this.players[playerID]!
+            if (player.cardsToResource > 0) {
+                allPlayersFinished = false
+            }
+        }
+        if (allPlayersFinished) {
+            this.data.phase = Phase.ACTION;
+            this.data.turn = this.data.initiative!
+        }
+    }
+
+    public async playerFinish(playerId: PlayerID) {
+        let player = this.players[playerId]!
+        player.finished = true
+
+        let allPlayersFinished = true;
+        for (let playerID in this.players) {
+            let player = this.players[playerID]!
+            if (!player.finished) {
+                allPlayersFinished = false
+            }
+        }
+        if (allPlayersFinished) {
+            await this.regroup()
+        }
+    }
+
+    public async claimInitive(playerId: PlayerID) {
+        if (this.data.initiative != null) {
+            console.log("cannot calim initive: Already claimed")
+            return
+        }
+        this.data.initiative = playerId
+        await this.playerFinish(playerId)
+    }
+
+    public async resourceCard(cardUid: CardUID, playerId: PlayerID) {
+        let player = this.players[playerId]!
+        if (player.cardsToResource <= 0) {
+            console.log("no resource attempts right now")
+            return
+        }
+        let index = player.hand.indexOf(cardUid)
+        if (index != -1) {
+            player.hand.splice(index,1)
+        } else {
+            console.log("cannot find card in hand")
+            // we cant play the card
+            return
+        }
+
+        this.data.cardCount += 1;
+        let cardResource: CardResource = {
+            ownerID: playerId,
+            cardID: this.data.cardCount,
+            cardUid: cardUid
+        }
+        player.resources.push(cardResource);
+        player.totalResources += 1;
+        player.resourcesRemaining += 1;
+
+        await this.checkStartActionPhase()
+    }
+
+    public async skipResource(playerId: PlayerID) {
+        let player = this.players[playerId]!
+        player.cardsToResource = 0
+        await this.checkStartActionPhase()
     }
 }

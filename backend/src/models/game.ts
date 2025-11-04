@@ -22,8 +22,6 @@ export interface CardBasic {
 
 export interface CardResource extends CardBasic {
     ownerID: PlayerID,
-    controllerID: PlayerID,
-    ready: boolean,
 }
 
 export interface CardStats extends CardBasic {
@@ -54,6 +52,8 @@ export interface PlayerState {
     deck: CardUID[],
     discard: CardUID[],
     resources: CardResource[],
+    totalResources: number,
+    resourcesRemaining: number,
     leader: Leader[],
     groundArena: CardActive[],
     spaceArena: CardActive[],
