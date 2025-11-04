@@ -11,6 +11,13 @@ export enum Arena {
     SPACE,
 }
 
+export enum Phase {
+    ACTION,
+    REGROUP,
+    SETUP,
+}
+
+
 export type CardUID = string;
 export type CardID = number;
 export type PlayerID = string;
@@ -57,13 +64,17 @@ export interface PlayerState {
     leader: Leader[],
     groundArena: CardActive[],
     spaceArena: CardActive[],
+    finished: boolean;
+    cardsToResource: number,
 }
 
 export interface Game {
     gameID: number;
     players: {[playerID: string] : PlayerState;}
     name: string;
-    initiative: PlayerID;
+    turn: PlayerID;
+    initiative: PlayerID | null;
+    phase: Phase;
     cardCount: number,
 }
 
