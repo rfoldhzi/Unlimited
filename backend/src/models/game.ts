@@ -74,6 +74,7 @@ export interface Game {
     name: string;
     turn: PlayerID;
     initiative: PlayerID | null;
+    initiativeClaimed: boolean;
     phase: Phase;
     cardCount: number,
 }

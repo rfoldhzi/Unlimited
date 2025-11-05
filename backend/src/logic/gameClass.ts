@@ -10,6 +10,7 @@ export class GameClass implements Game {
     data: Game;
     phase: Phase;
     turn: PlayerID;
+    initiativeClaimed: boolean;
 
     public constructor(data: Game) {
         this.data = data
@@ -20,6 +21,7 @@ export class GameClass implements Game {
         this.cardCount = data.cardCount
         this.phase = data.phase;
         this.turn = data.turn;
+        this.initiativeClaimed = data.initiativeClaimed;
     }
 
     /**
@@ -77,7 +79,20 @@ export class GameClass implements Game {
         }
     }
 
+    /**
+     * ACTION
+     * 
+     * @param playerID 
+     * @param attackerID 
+     * @param defenderID 
+     * @returns 
+     */
     public async attackCard(playerID: PlayerID, attackerID: CardID, defenderID: CardID) {
+        if (this.data.turn != playerID) {
+            console.log("Cannot attack: Not this player's turn!")
+            return
+        }
+        
         let attacker = this.findUnitByPlayer(playerID, attackerID)
         let defender = this.findUnitAnyPlayer(defenderID)
         console.log("attacker",attacker)
@@ -105,6 +120,8 @@ export class GameClass implements Game {
 
         if (attacker.damage >= attacker.hp) this.defeatCard(attacker)
         if (defender.damage >= defender.hp) this.defeatCard(defender)
+    
+        await this.endTurn()
     }
 
     public async drawCard(playerId: PlayerID) {
@@ -113,7 +130,19 @@ export class GameClass implements Game {
         player.hand.push(cardUid)
     }
 
+    /**
+     * ACTION
+     * 
+     * @param cardUid 
+     * @param playerId 
+     * @returns 
+     */
     public async playCard(cardUid: CardUID, playerId: PlayerID) {
+        if (this.data.turn != playerId) {
+            console.log("Cannot play card: Not this player's turn!")
+            return
+        }
+
         console.log("playCard1")
         let card = await createCard(cardUid)
         if (card == null) {
@@ -145,20 +174,29 @@ export class GameClass implements Game {
         } else if (card.arena == Arena.SPACE) {
             player.spaceArena.push(card)
         }
+
+        await this.endTurn()
     }
 
     public async regroup() {
         this.data.phase = Phase.REGROUP
+        this.data.initiativeClaimed = false
         for (let playerID in this.players) {
-            let player = this.players[playerID]!
+            console.log("cleaning player", playerID)
+            let player = this.data.players[playerID]!
             for (let c of player.groundArena) {
                 c.ready = true
             }
             for (let c of player.spaceArena) {
                 c.ready = true
             }
-            this.drawCard(playerID);
+            player.resourcesRemaining = player.totalResources;
+            await this.drawCard(playerID);
+            await this.drawCard(playerID);
+            player.finished = false;
+            console.log("cardsToResource1", player.cardsToResource)
             player.cardsToResource = 1;
+            console.log("cardsToResource2", player.cardsToResource)
         }
     }   
 
@@ -177,7 +215,15 @@ export class GameClass implements Game {
         }
     }
 
+    /**
+     * ACTION
+     * @param playerId 
+     */
     public async playerFinish(playerId: PlayerID) {
+        if (this.data.turn != playerId) {
+            console.log("Cannot finsih and pass: Not this player's turn!")
+            return
+        }
         let player = this.players[playerId]!
         player.finished = true
 
@@ -190,15 +236,28 @@ export class GameClass implements Game {
         }
         if (allPlayersFinished) {
             await this.regroup()
+        } else {
+            await this.endTurn()
         }
     }
 
-    public async claimInitive(playerId: PlayerID) {
-        if (this.data.initiative != null) {
+    /**
+     * ACTION
+     * 
+     * @param playerId 
+     * @returns 
+     */
+    public async claimInitiative(playerId: PlayerID) {
+        if (this.data.turn != playerId) {
+            console.log("Cannot claim initiative: Not this player's turn!")
+            return
+        }
+        if (this.data.initiativeClaimed) {
             console.log("cannot calim initive: Already claimed")
             return
         }
         this.data.initiative = playerId
+        this.data.initiativeClaimed = true
         await this.playerFinish(playerId)
     }
 
@@ -226,6 +285,7 @@ export class GameClass implements Game {
         player.resources.push(cardResource);
         player.totalResources += 1;
         player.resourcesRemaining += 1;
+        player.cardsToResource -= 1;
 
         await this.checkStartActionPhase()
     }
@@ -234,5 +294,41 @@ export class GameClass implements Game {
         let player = this.players[playerId]!
         player.cardsToResource = 0
         await this.checkStartActionPhase()
+    }
+
+    public async endTurn() {
+        console.log("end turn called")
+        let allPlayersFinished = true;
+        for (let playerID in this.players) {
+            let player = this.players[playerID]!
+            if (!player.finished) {
+                allPlayersFinished = false
+            }
+        }
+        if (allPlayersFinished) {
+            console.log("regrouping...")
+            await this.regroup()
+            return
+        }
+
+        let turnOrder: PlayerID[] = Object.keys(this.data.players)
+        let i = turnOrder.indexOf(this.data.turn)
+        if (i == -1) {
+            console.log("cannot end turn: Current turn invalid", this.data.turn)
+            return 
+        }
+        console.log("turn Order1", turnOrder, i, turnOrder[i])
+        let counter = 0
+        while (counter < turnOrder.length) {
+            i = (i+1) % turnOrder.length
+            if (!this.players[turnOrder[i] as any]!.finished) {
+                this.data.turn = turnOrder[i] as PlayerID
+                console.log("turn Order2", turnOrder, i, turnOrder[i])
+                return;
+            }
+            counter += 1
+        }
+        console.log("turn Order3", turnOrder, i, turnOrder[i])
+        console.log("went through all players, couldn't find one ready??")
     }
 }

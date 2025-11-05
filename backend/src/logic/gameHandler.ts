@@ -1,4 +1,4 @@
-import { Arena, CardActive, CardUID, Game, games, PlayerState } from "../models/game"
+import { Arena, CardActive, CardUID, Game, games, Phase, PlayerState } from "../models/game"
 const https = require('https');
 
 let deckCodes = [
@@ -150,7 +150,11 @@ export const createPlayer = (player: string): PlayerState => {
         leader: [],
         groundArena: [],
         spaceArena: [],
-        discard: []
+        discard: [],
+        totalResources: 2,
+        resourcesRemaining: 2,
+        finished: false,
+        cardsToResource: 0
     }
     return player1
 }
@@ -168,16 +172,23 @@ export const createSampleGame = async (): Promise<Game> => {
         leader: [],
         groundArena: [],
         spaceArena: [],
-        discard: []
+        discard: [],
+        totalResources: 2,
+        resourcesRemaining: 2,
+        finished: false,
+        cardsToResource: 0
     }
     let game: Game = {
         gameID: 0,
         cardCount: 0,
         players: {
-            "0":player1
+            "0": player1
         },
         name: "Cloud",
         initiative: "0",
+        turn: "0",
+        phase: Phase.ACTION,
+        initiativeClaimed: false
     }
     return game
 }

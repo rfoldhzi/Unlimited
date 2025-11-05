@@ -3,9 +3,10 @@ import React, { useContext, useEffect } from 'react';
 import Image from "../../image/image.js"
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Hand.css"
-import type { CardActive, CardUID, CardStats } from '../../models/game.js';
+import { type CardActive, type CardUID, type CardStats, Phase } from '../../models/game.ts';
 import Card from '../card/Card.tsx';
 import { PlayerName } from './Hand2.tsx';
+import type { Game } from '../../models/game.ts';
 
 interface Props {
     onSend?: any
@@ -20,45 +21,33 @@ export default function Hand({ onSend, lastMessage }: Props) {
 
   const { data, setValue } = useCardLookUp();
 
-
+  
 
   if (lastMessage && lastMessage.charAt(0) == "{") {
-    let game = JSON.parse(lastMessage)
+    let game = JSON.parse(lastMessage) as Game
+    let player = game.players[PlayerName]!
+
+    let cardSelected = (card: CardUID) => {
+      if (game.phase == Phase.ACTION) {
+        onSend(`Play Card:${PlayerName}:${card}`)
+      } else {
+        if (player.cardsToResource > 0) {
+          onSend(`Resource Card:${PlayerName}:${card}`)
+        }
+      }
+    } 
+
     return (
       <div className="hand-container">
-      {game.players[PlayerName].hand.map((x: CardUID, i: number) => {
+      {player.hand.map((x: CardUID, i: number) => {
           return (<div className='b'>
           <Card 
-            clickFunction={() => onSend(`Play Card:${PlayerName}:` + x)} card={x}            
+            clickFunction={() => cardSelected(x)} card={x}            
           ></Card>
           </div>)
         })}
       </div>
     )
-    // let handList: CardStats[] = []
-    // game.players["0"].hand.forEach((element: CardUID) => {
-    //   if (data[element]) {
-    //     if (data[element]?.imgURL) {
-    //       handList.push(data[element])
-    //     }
-    //   } else {
-    //     setValue(element)
-    //   }
-    // });
-    // return (
-    // <div className="hand-container">
-    //   {handList.map((x: CardStats, i: number) => {
-    //     return (<div className='b'>
-    //     <img onClick={() => onSend('Play Card:0:'+x.cardUid)}
-    //       src={x.imgURL}
-    //       alt="card" 
-    //       className="a"
-          
-    //     ></img>
-    //     </div>)
-    //   })}
-    // </div>
-    // );
   }
 
   console.log("last Message", lastMessage)

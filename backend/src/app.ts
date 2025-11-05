@@ -11,6 +11,15 @@ const server = require('http').createServer(app);
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ server: server });
 
+function sendAll(data: string) {
+    // Broadcast the received message to all connected clients
+    wss.clients.forEach(function each(client: any) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    });
+}
+
 wss.on('connection', (ws: any) => {
     console.log('Client connected');
 
@@ -22,7 +31,7 @@ wss.on('connection', (ws: any) => {
             ws.send(JSON.stringify(game))
         } else if (message == "restart") {
             let game = await sampleGame(true)
-            ws.send(JSON.stringify(game))
+            sendAll(JSON.stringify(game))
         } else {
             let split = message.toString().split(":")
             if (split[0] == "Play Card") {
@@ -39,7 +48,7 @@ wss.on('connection', (ws: any) => {
                 console.log("game2.hand", game!.players['0']!.hand)
                 console.log("gameClass", gameClass)
                 console.log("gameClass.hand", gameClass!.players['0']!.hand)
-                ws.send(JSON.stringify(gameClass))
+                sendAll(JSON.stringify(game))
             } else if (split[0] == "Attack Card") {
                 let playerID = split[1]!
                 let attackerID = split[2]!
@@ -50,7 +59,7 @@ wss.on('connection', (ws: any) => {
                 let gameClass = new GameClass(game!)
                 console.log("app1")
                 await gameClass.attackCard(playerID, attackerID, defenderrID)
-                ws.send(JSON.stringify(gameClass))
+                sendAll(JSON.stringify(game))
             } else if (split[0] == "import deck") {
                 let player = split[1]!
                 let game = await sampleGame(false, player)
@@ -61,14 +70,47 @@ wss.on('connection', (ws: any) => {
                 for (let i=0; i<6; i++) {
                     gameClass.drawCard(player)
                 }
-                ws.send(JSON.stringify(gameClass))
+                sendAll(JSON.stringify(game))
+            } else if (split[0] == "initiative") {
+                let player = split[1]!
+                let game = await sampleGame(false, player)
+
+                let gameClass = new GameClass(game!)
+
+                if (player) {
+                    gameClass.claimInitiative(player)
+                }
+
+                sendAll(JSON.stringify(game))
+            } else if (split[0] == "pass") {
+                let player = split[1]!
+                let game = await sampleGame(false, player)
+
+                let gameClass = new GameClass(game!)
+
+                if (player) {
+                    await gameClass.playerFinish(player)
+                }
+
+                console.log("gameClass",gameClass)
+                console.log("game",game)
+
+                sendAll(JSON.stringify(game))
             } else if (split[0] == "Draw Card") {
                 let player = split[1]!
                 
                 let game = await sampleGame(false, player)
                 let gameClass = new GameClass(game!)
                 await gameClass.drawCard(player)
-                ws.send(JSON.stringify(gameClass))
+                sendAll(JSON.stringify(game))
+            } else if (split[0] == "Resource Card") {
+                let player = split[1]!
+                let cardUid = split[2]!
+                
+                let game = await sampleGame(false, player)
+                let gameClass = new GameClass(game!)
+                await gameClass.resourceCard(cardUid, player)
+                sendAll(JSON.stringify(game))
             } else {
                 // Echo message back to the client
                 ws.send(`Server received: ${message}`);

@@ -8,6 +8,7 @@ import Arena from "../arena/Arena.tsx"
 import { ReadyState } from "react-use-websocket";
 
 import useWebSocket from "react-use-websocket"
+import Info from '../info/Info.tsx';
 
 const useWs = (useWebSocket as any).default as typeof useWebSocket
 
@@ -52,6 +53,7 @@ export default function Home() {
   return (
     <div>
       <Hand onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Hand>
+      <Info onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Info>
       <Arena onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Arena>
       <button onClick={handleClickChangeSocketUrl}>
         Click Me to change Socket Url

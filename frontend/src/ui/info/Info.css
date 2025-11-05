@@ -1,0 +1,70 @@
+.info-container {
+    position: absolute;
+    bottom: 150px;
+    right: 0;
+    display: flex;
+}
+
+.action-button {
+    margin-right: 10px;
+    background-color: #131313;
+    padding: 10px;
+    border-radius: 16px;
+    transform: translateZ(0);
+    border: solid transparent;
+    border-width: 0 0 4px;  
+}
+
+.action-button:after {
+  background-clip: padding-box;
+  background-color: #252525;
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  bottom: -4px;
+  content: "";
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: -1;
+}
+
+.action-button:hover {
+    background-color: #131313;
+    border-width: 0px 0 2px;  
+}
+
+.action-button:hover:after {
+  background-color: #1f1f1f;
+}
+
+
+.resources {
+    background-color: #b18b08;
+    color: white;
+    border-radius: 20px;
+    width: 70px;
+    height: 70px;
+    line-height: 70px;
+    font-size: 40px;
+    font-weight: 900;
+    -webkit-text-stroke: 2px black;
+    font-family: monospace;
+}
+.cardsToResource {
+    background-color: #cda417;
+    color: white;
+    border-radius: 50px;
+    width: 70px;
+    height: 70px;
+    line-height: 70px;
+    font-size: 40px;
+    font-weight: 900;
+    -webkit-text-stroke: 2px black;
+    font-family: monospace;
+    position: absolute;
+    right: 0px;
+    top: -70px;
+    z-index: 3;
+}
