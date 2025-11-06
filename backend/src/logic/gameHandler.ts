@@ -1,4 +1,4 @@
-import { Arena, Aspect, Base, CardActive, CardUID, Game, games, Phase, PlayerState } from "../models/game"
+import { Arena, Aspect, Base, CardActive, CardUID, Game, games, Leader, Phase, PlayerState } from "../models/game"
 const https = require('https');
 
 let deckCodes = [
@@ -78,15 +78,27 @@ export async function importDeck(code: string, player: PlayerState, randomize?: 
     }
     let base: Base = {
         cardUid: data.base.cardId,
-        aspect: data.base.card.aspects.map((item: any) => item.name),
+        aspect: data.base.card.aspects.map((item: any) => item.name)[0],
         hp: data.base.card.hp,
         damage: 0,
     }
+    let leaders: Leader[] = data.leaders.map((item: any) => {
+        let leader: Leader = {
+            cardUid: item.cardId,
+            aspects: item.card.aspects.map((item: any) => item.name),
+            ready: true,
+            epicActionAvailable: true,
+            deployed: false
+        }
+        return  leader
+    })
     console.log("player",player);
     console.log("deck",deck);
+    console.log("leaders",deck);
 
     player.deck = deck;
     player.base = base;
+    player.leaders = leaders;
 }
 
 async function fetchCard(cardUid: CardUID) {
@@ -161,10 +173,10 @@ export const createPlayer = (player: string): PlayerState => {
     let player1: PlayerState = {
         playerID: player,
         base: base,
+        leaders: [],
         hand: ["2383321298", "6867378216", "7227136692", "3347454174", "9655836052", "2151832252", "9127322562"],
         resources: [],
         deck: [],
-        leader: [],
         groundArena: [],
         spaceArena: [],
         discard: [],
@@ -190,10 +202,10 @@ export const createSampleGame = async (): Promise<Game> => {
     let player1: PlayerState = {
         playerID: "0",
         base: base,
+        leaders: [],
         hand: ["2383321298", "6867378216", "7227136692", "3347454174", "9655836052", "2151832252", "9127322562"],
         resources: [],
         deck: [],
-        leader: [],
         groundArena: [],
         spaceArena: [],
         discard: [],

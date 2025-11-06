@@ -7,6 +7,7 @@ import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react
 import Info from '../info/Info.tsx';
 import Base from '../base/Base.tsx';
 import "./Opponent.css"
+import Leader from '../leader/Leader.tsx';
 
 interface Props {
   onSend?: any,
@@ -32,6 +33,7 @@ export default function Opponent({ onSend, lastMessage, }: Props) {
               <div key={opName} className='opponent-container'>
                 <Info playerID={opName} onSend={onSend} lastMessage={lastMessage}></Info>
                 <Base playerID={opName} onSend={onSend} lastMessage={lastMessage}></Base>
+                <Leader playerID={opName} onSend={onSend} lastMessage={lastMessage}></Leader>
               </div>
             )
           })

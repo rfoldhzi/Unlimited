@@ -35,6 +35,14 @@ export interface Base {
     damage: number,
 }
 
+export interface Leader {
+    cardUid: CardUID,
+    aspects: Aspect[],
+    ready: boolean,
+    epicActionAvailable: boolean,
+    deployed: boolean,
+}
+
 export interface CardResource extends CardBasic {
     ownerID: PlayerID,
 }
@@ -57,20 +65,16 @@ export interface CardActive extends CardStats {
     controllerID: PlayerID,
 }
 
-export interface Leader extends CardActive {
-    aspects: Aspect[],
-}
-
 export interface PlayerState {
     playerID: PlayerID,
     base: Base,
+    leaders: Leader[],
     hand: CardUID[],
     deck: CardUID[],
     discard: CardUID[],
     resources: CardResource[],
     totalResources: number,
     resourcesRemaining: number,
-    leader: Leader[],
     groundArena: CardActive[],
     spaceArena: CardActive[],
     finished: boolean;

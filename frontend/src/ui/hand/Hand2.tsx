@@ -12,6 +12,7 @@ import Info from '../info/Info.tsx';
 import Base from '../base/Base.tsx';
 import Opponent from '../opponent/Opponent.tsx';
 import "../home/Home.css"
+import Leader from '../leader/Leader.tsx';
 
 const useWs = (useWebSocket as any).default as typeof useWebSocket
 
@@ -62,6 +63,7 @@ export default function Home() {
         <div className="player-info-container-child">
           <Info playerID={PlayerName} onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Info>
           <Base playerID={PlayerName} onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Base>
+          <Leader playerID={PlayerName} onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Leader>
         </div>
       </div>
       <Arena onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Arena>

@@ -1,0 +1,13 @@
+.leader-container {
+   position: absolute;
+    bottom: 0px;
+    left: 0%;
+    display: flex;
+    pointer-events: all;
+}
+
+.leader-card {
+    width: auto;
+    height: 150px;
+    max-width: 500px;
+}
