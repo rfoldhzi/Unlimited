@@ -9,6 +9,9 @@ import { ReadyState } from "react-use-websocket";
 
 import useWebSocket from "react-use-websocket"
 import Info from '../info/Info.tsx';
+import Base from '../base/Base.tsx';
+import Opponent from '../opponent/Opponent.tsx';
+import "../home/Home.css"
 
 const useWs = (useWebSocket as any).default as typeof useWebSocket
 
@@ -21,7 +24,7 @@ export let PlayerName = "Default"
 
 export default function Home() {
   //Public API that will echo messages sent to it back to the client
-//   const [socketUrl, setSocketUrl] = useState('wss://echo.websocket.org');
+  //   const [socketUrl, setSocketUrl] = useState('wss://echo.websocket.org');
   const [socketUrl, setSocketUrl] = useState('ws://localhost:9000');
   const [messageHistory, setMessageHistory] = useState([]);
 
@@ -52,9 +55,18 @@ export default function Home() {
 
   return (
     <div>
+      <Opponent onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Opponent>
+
       <Hand onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Hand>
-      <Info onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Info>
+      <div className="player-info-container-parent">
+        <div className="player-info-container-child">
+          <Info playerID={PlayerName} onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Info>
+          <Base playerID={PlayerName} onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Base>
+        </div>
+      </div>
       <Arena onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Arena>
+      { !lastMessage?.data &&
+        <div>
       <button onClick={handleClickChangeSocketUrl}>
         Click Me to change Socket Url
       </button>
@@ -83,6 +95,8 @@ export default function Home() {
         Click Me to send 'GAME'
       </button>
       <span>The WebSocket is currently {connectionStatus}</span>
+      </div>
+      }
       {/* {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
       <ul>
         {messageHistory.map((message, idx) => (

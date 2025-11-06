@@ -3,14 +3,15 @@ import React, { useContext, useEffect } from 'react';
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Info.css"
 import { PlayerName } from '../hand/Hand2.tsx';
-import { Phase, type Game } from '../../models/game.ts';
+import { Phase, type Game, type PlayerID } from '../../models/game.ts';
 
 interface Props {
   onSend?: any
-  lastMessage?: string
+  lastMessage?: string,
+  playerID: PlayerID,
 }
 
-export default function Info({ onSend, lastMessage }: Props) {
+export default function Info({ playerID, onSend, lastMessage }: Props) {
 
   useEffect(() => {
 
@@ -26,7 +27,7 @@ export default function Info({ onSend, lastMessage }: Props) {
     let player = game.players[PlayerName]!
     totalResources = player.totalResources
     remainingResources = player.resourcesRemaining
-    yourTurn = game.turn == PlayerName && game.phase == Phase.ACTION
+    yourTurn = game.turn == PlayerName && game.phase == Phase.ACTION && playerID == PlayerName
 
     if (player.cardsToResource) {
       cardsToResourceDiv = (<div className="cardsToResource">

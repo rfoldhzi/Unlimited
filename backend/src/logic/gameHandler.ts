@@ -1,8 +1,8 @@
-import { Arena, CardActive, CardUID, Game, games, Phase, PlayerState } from "../models/game"
+import { Arena, Aspect, Base, CardActive, CardUID, Game, games, Phase, PlayerState } from "../models/game"
 const https = require('https');
 
 let deckCodes = [
-    "U2FsdGVkX18MXyRr/j5zacb6LjmsLpjpSpejheIax2KNmzVL0LAW0so+acubQrt9V3mbBrLwrsYE7akB4rJBgFdIj2Rnm7jZ5iqrz7BGDvwYf7Ms/CMW+NduAiRSTEWZhrmC/iGteScoq0snlU57jhhxcuZcuLuBeLrEGX+40hOMVW5J0AhpIF7KVYHQ/WDj4C3TYVJ/TZa8RIBN5wMP+UezTA9dFSM0uE4HwCFcDkDizHh3Vdwrt8mGxGIErF/egJdeasllAfWTJeCFPH48GZoWbffkJTQNsYA4ch6MGHAjOXGLC2Xi7h5spDaj2fw5",
+    "U2FsdGVkX1+wDBJsH2FMDcjgFeTWDZUrf8TcGdQiRT278TOgd1LYr6FqUaxI+ZhTPel7DJDJK/iMYLyS0IY6K+beaeJEF3/A2BYhqKpnURX0FMD+Luzb8xCh6O77mc1rc8D6qffkMPD2AHxTKr4l76ttEoepfrRpHRpzCfHlCU08nX/CYOvvwMMhAsi6YeP1E9KwEzP120YMcyp4xczyNxcGKJwKKSJ/N+RBl2YZYVcG2R34OxEBnQpYxibLDZ4UWNu4bEdOX2qqXYbm4XG8gMiDssrz3fOV9FQm0rWo1p38917pnMhYgKMGOyJQSW5F",
     "U2FsdGVkX1/SRuccWp65qiVOVoN0zA05HGMMU4ReY72AJwZ7KzagONJsZaG++40YIjd6+XWQQhH0lmZeTOQRVP5sANOR4VMsKZrNGf2RUeRXY1aPJUvLXBUnya4C+0C5l7FoyE5pSG0/Skj6qtObBRi1gQD9/d9yumHiGBzDXZ/22GVeXFpxDWJaOWoamUyTAWvKJAr6iloX9M34bexLsRztTux/7zturL5TUKQ3MiFcDULc8eXvd5aFhbJ5F37cI6rLDoypGTcw5viICbMTmud6gDRYDUdSGi2GHROLTP458sbUk70azdnbAt5ofTLNcbGz3AtgZQzhh7H/9Z713xzqxXZThWnv/n/x3AjOppDabvxUyACn9/39mHXudltO",
 ]
 
@@ -61,7 +61,7 @@ function shuffleArray(array: any[]) {
     }
 }
 
-export async function importDeck(code: string, randomize?: boolean): Promise<CardUID[]> {
+export async function importDeck(code: string, player: PlayerState, randomize?: boolean) {
     
     console.log("deck1")
     let data: any = await fetchDeck(code)
@@ -76,7 +76,17 @@ export async function importDeck(code: string, randomize?: boolean): Promise<Car
     if (randomize) {
         shuffleArray(deck)
     }
-    return deck
+    let base: Base = {
+        cardUid: data.base.cardId,
+        aspect: data.base.card.aspects.map((item: any) => item.name),
+        hp: data.base.card.hp,
+        damage: 0,
+    }
+    console.log("player",player);
+    console.log("deck",deck);
+
+    player.deck = deck;
+    player.base = base;
 }
 
 async function fetchCard(cardUid: CardUID) {
@@ -142,8 +152,15 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
 }
 
 export const createPlayer = (player: string): PlayerState => {
+    let base: Base = {
+        cardUid: "6093792814",
+        aspect: Aspect.CUNNING,
+        hp: 0,
+        damage: 0
+    }
     let player1: PlayerState = {
         playerID: player,
+        base: base,
         hand: ["2383321298", "6867378216", "7227136692", "3347454174", "9655836052", "2151832252", "9127322562"],
         resources: [],
         deck: [],
@@ -164,8 +181,15 @@ export const createSampleGame = async (): Promise<Game> => {
     // let card = await createCard(2383321298) // StormTrooper
     // let card2 = await createCard(6867378216) // Tie Fighter
     // console.log("card", card)
+    let base: Base = {
+        cardUid: "6093792814",
+        aspect: Aspect.CUNNING,
+        hp: 0,
+        damage: 0
+    }
     let player1: PlayerState = {
         playerID: "0",
+        base: base,
         hand: ["2383321298", "6867378216", "7227136692", "3347454174", "9655836052", "2151832252", "9127322562"],
         resources: [],
         deck: [],
@@ -188,7 +212,8 @@ export const createSampleGame = async (): Promise<Game> => {
         initiative: "0",
         turn: "0",
         phase: Phase.ACTION,
-        initiativeClaimed: false
+        initiativeClaimed: false,
+        winner: undefined,
     }
     return game
 }

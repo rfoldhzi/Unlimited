@@ -1,8 +1,9 @@
 .info-container {
     position: absolute;
-    bottom: 150px;
+    bottom: 0;
     right: 0;
     display: flex;
+    pointer-events: all;
 }
 
 .action-button {

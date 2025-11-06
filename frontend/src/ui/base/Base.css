@@ -1,0 +1,28 @@
+.base-container {
+   position: absolute;
+    bottom: 0px;
+    right: 50%;
+    display: flex;
+    transform: translate(50%, 0);
+    pointer-events: all;
+}
+
+.base-card {
+    width: auto;
+    height: 150px;
+    max-width: 500px;
+}
+
+.health-text {
+    position: absolute;
+    top: 30px;
+    left: 2px;
+    color: rgb(0, 162, 255);
+    background-color: #000000;
+    /* height: 30px; */
+    font-family: monospace;
+    font-size: 30px;
+    line-height: 30px;
+    padding: 4px;
+    border-radius: 5px;
+}

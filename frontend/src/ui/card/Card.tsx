@@ -26,7 +26,7 @@ export default function Card({ card, clickFunction }: Props) {
                 url = data[uid]?.imgURL!
             }
             if (data[uid]?.aspectCost) {
-                aspectColor = data[uid]?.aspectCost[0] || ""
+                aspectColor = data[uid]?.aspectCost[0] || "" as any
             }
         } else {
             if (uid) {
@@ -36,7 +36,7 @@ export default function Card({ card, clickFunction }: Props) {
         }
     } else {
         url = card.imgURL!
-        aspectColor = card.aspectCost[0] || ""
+        aspectColor = card.aspectCost[0] || "" as any
         ready = card.ready
         if (card.damage > 0) {
             damage = String(card.damage)

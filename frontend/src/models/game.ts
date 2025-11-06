@@ -15,16 +15,24 @@ export enum Phase {
     ACTION,
     REGROUP,
     SETUP,
+    GAME_OVER,
 }
 
 
-export type CardUID = string;
+export type CardUID = string; // DB version of id
 export type CardID = number;
 export type PlayerID = string;
 
 export interface CardBasic {
     cardID: CardID,
     cardUid: CardUID, // DB version of id
+}
+
+export interface Base {
+    cardUid: CardUID,
+    aspect: Aspect,
+    hp: number,
+    damage: number,
 }
 
 export interface CardResource extends CardBasic {
@@ -55,6 +63,7 @@ export interface Leader extends CardActive {
 
 export interface PlayerState {
     playerID: PlayerID,
+    base: Base,
     hand: CardUID[],
     deck: CardUID[],
     discard: CardUID[],
@@ -77,6 +86,7 @@ export interface Game {
     initiativeClaimed: boolean;
     phase: Phase;
     cardCount: number,
+    winner: PlayerID | undefined,
 }
 
 export let games: Game[] = [];

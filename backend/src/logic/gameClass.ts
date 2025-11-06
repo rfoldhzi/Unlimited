@@ -11,6 +11,7 @@ export class GameClass implements Game {
     phase: Phase;
     turn: PlayerID;
     initiativeClaimed: boolean;
+    winner: PlayerID | undefined;
 
     public constructor(data: Game) {
         this.data = data
@@ -22,6 +23,7 @@ export class GameClass implements Game {
         this.phase = data.phase;
         this.turn = data.turn;
         this.initiativeClaimed = data.initiativeClaimed;
+        this.winner = data.winner;
     }
 
     /**
@@ -79,6 +81,11 @@ export class GameClass implements Game {
         }
     }
 
+    public async victory(playerID: PlayerID) {
+        this.data.phase = Phase.GAME_OVER;
+        this.data.winner = playerID;
+    }
+
     /**
      * ACTION
      * 
@@ -120,6 +127,49 @@ export class GameClass implements Game {
 
         if (attacker.damage >= attacker.hp) this.defeatCard(attacker)
         if (defender.damage >= defender.hp) this.defeatCard(defender)
+    
+        await this.endTurn()
+    }
+
+    /**
+     * ACTION
+     * 
+     * @param playerID 
+     * @param attackerID 
+     * @param defenderPlayerID 
+     * @returns 
+     */
+    public async attackBase(playerID: PlayerID, attackerID: CardID, defenderPlayerID: PlayerID) {
+        if (this.data.turn != playerID) {
+            console.log("Cannot attack: Not this player's turn!")
+            return
+        }
+        
+        let attacker = this.findUnitByPlayer(playerID, attackerID)
+        let defenderBase = this.players[defenderPlayerID]?.base
+        console.log("attacker",attacker)
+        console.log("defender",defenderBase)
+        if (!attacker) {
+            console.log("Declined Attack: Can't find attacker")
+            return
+        }
+        if (!defenderBase) {
+            console.log("Declined Attack: Can't find defenderBase")
+            return
+        }
+        if (attacker.controllerID == defenderPlayerID) {
+            console.log("Declined Attack: Can't attack card on same team")
+            return
+        }
+        if (!attacker.ready) {
+            console.log("Declined Attack: Attacker must be ready")
+            return
+        }
+
+        attacker.ready = false
+        defenderBase.damage += attacker.power
+
+        if (defenderBase.damage >= defenderBase.hp) this.victory(playerID)
     
         await this.endTurn()
     }
