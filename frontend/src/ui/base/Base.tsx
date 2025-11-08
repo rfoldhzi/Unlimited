@@ -57,12 +57,12 @@ export default function Base({ playerID, onSend, lastMessage, }: Props) {
           </p>
           <img onClick={(event: any) => {
             console.log("event", event)
-            // clickFunction()
-            setIsOpen(true)
+            baseClicked()
+            // setIsOpen(true)
           }}
             onContextMenu={(event: any) => {
-              // event.preventDefault()
-              // setIsOpen(true)
+              event.preventDefault()
+              setIsOpen(true)
               console.log("event2", event)
               return false
             }}

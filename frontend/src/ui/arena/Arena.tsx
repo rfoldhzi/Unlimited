@@ -7,6 +7,7 @@ import type { CardActive, CardUID, CardStats } from '../../models/game.ts';
 import { PlayerName } from '../hand/Hand2.tsx';
 import Card from '../card/Card.tsx';
 import { useSelectedCard } from '../../context/selectedCard.tsx';
+import FlipMove from 'react-flip-move';
 
 interface Props {
   onSend?: any
@@ -25,6 +26,10 @@ export default function Arena({ onSend, lastMessage }: Props) {
 
   let friendselectedCard = (card: CardActive) => {
     setCard(card)
+  }
+
+  let abc = (card: CardActive) => {
+    // return <FlipMove></FlipMove>
   }
 
   let enemyselectedCard = (card: CardActive) => {
@@ -46,13 +51,13 @@ export default function Arena({ onSend, lastMessage }: Props) {
           {
             Object.keys(game.players).filter((playerName: string) => {
               return playerName != PlayerName
-            }).map((playerName: string) => {
+            }).map((playerName: string, i:number) => {
               return (
                 <div key={playerName} className='flex-center'>
                   {
-                    game.players[playerName].groundArena.map((x: CardActive, i: number) => {
+                    game.players[playerName].groundArena.map((x: CardActive, j: number) => {
                       return (<div className='b'>
-                        <Card card={x} clickFunction={() => {enemyselectedCard(x)}}></Card>
+                        <Card key={x.cardID+"activeCard"+playerName+j} card={x} clickFunction={() => {enemyselectedCard(x)}}></Card>
                       </div>)
                     })
                   }
@@ -63,7 +68,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
           <div className='flex-center'>
             {game.players[PlayerName].groundArena.map((x: CardActive, i: number) => {
               return (<div className={'b '+ (selectedCard?.cardID == x.cardID ? 'selected': '')}>
-                <Card card={x} clickFunction={() => {friendselectedCard(x)}}></Card>
+                <Card key={x.cardID+"activeCard"} card={x} clickFunction={() => {friendselectedCard(x)}}></Card>
               </div>)
             })}
           </div>
@@ -78,7 +83,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
                   {
                     game.players[playerName].spaceArena.map((x: CardActive, i: number) => {
                       return (<div className='b'>
-                        <Card card={x} clickFunction={() => {enemyselectedCard(x)}}></Card>
+                        <Card key={x.cardID+"activeCard"} card={x} clickFunction={() => {enemyselectedCard(x)}}></Card>
                       </div>)
                     })
                   }
@@ -89,7 +94,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
           <div className='flex-center'>
             {game.players[PlayerName].spaceArena.map((x: CardActive, i: number) => {
               return (<div className={'b '+ (selectedCard?.cardID == x.cardID ? 'selected': '')}>
-                <Card card={x} clickFunction={() => {friendselectedCard(x)}}></Card>
+                <Card key={x.cardID+"activeCard"} card={x} clickFunction={() => {friendselectedCard(x)}}></Card>
               </div>)
             })}
           </div>

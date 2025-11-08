@@ -4,7 +4,7 @@ import Image from "../../image/image.js"
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Hand.css"
 import { type CardActive, type CardUID, type CardStats, Phase } from '../../models/game.ts';
-import Card from '../card/Card.tsx';
+import Card, { CardArea } from '../card/Card.tsx';
 import { PlayerName } from './Hand2.tsx';
 import type { Game } from '../../models/game.ts';
 
@@ -42,7 +42,10 @@ export default function Hand({ onSend, lastMessage }: Props) {
       {player.hand.map((x: CardUID, i: number) => {
           return (<div className='b'>
           <Card 
-            clickFunction={() => cardSelected(x)} card={x}            
+            clickFunction={() => cardSelected(x)} 
+            card={x}  
+            cardArea={CardArea.HAND}       
+            resources={player.resourcesRemaining}   
           ></Card>
           </div>)
         })}

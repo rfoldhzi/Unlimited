@@ -1,23 +1,40 @@
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
-import type { CardActive, CardUID } from "../../models/game.ts";
+import type { Aspect, CardActive, CardStats, CardUID } from "../../models/game.ts";
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { useState } from 'react'
 import "./Card.css"
 
 interface Props {
     card: CardUID | CardActive,
-    clickFunction: any
+    clickFunction: any,
+    cardArea?: CardArea,
+    resources?: number,
+    ownedAspects?: Aspect[],
 }
 
-export default function Card({ card, clickFunction }: Props) {
+export enum CardArea {
+    ARENA,
+    HAND,
+}
+
+export default function Card({ card, clickFunction, cardArea, resources, ownedAspects }: Props) {
     let url: string = ""
     let aspectColor: string = ""
     let uid: CardUID = ""
     let damage: string = ""
     let ready = true
+    let affordable = true
 
     let [isOpen, setIsOpen] = useState(false)
     const { data, setValue } = useCardLookUp();
+
+    let checkPriceCard = (card: CardStats): boolean => {
+        console.log("check price card", card, resources)
+        if (resources! < card.cost) {
+            return false
+        }
+        return true
+    }
 
     if (typeof card === "string") {
         uid = card as CardUID
@@ -27,6 +44,8 @@ export default function Card({ card, clickFunction }: Props) {
             }
             if (data[uid]?.aspectCost) {
                 aspectColor = data[uid]?.aspectCost[0] || "" as any
+                if (cardArea == CardArea.HAND)
+                    affordable = checkPriceCard(data[uid]!)
             }
         } else {
             if (uid) {
@@ -46,34 +65,39 @@ export default function Card({ card, clickFunction }: Props) {
     // If card is CardActive, new check
 
 
-
+    let loaded = ()  => {
+        console.log("anything2",uid)
+        return true
+    }
 
 
     return (
-        <div className='b'>
+        <div className='c'>
             <p className="damage-text">
                 {damage}
             </p>
             <img onClick={(event: any) => {
                 console.log("event", event)
-                // clickFunction()
-                setIsOpen(true)
+                clickFunction()
+                // setIsOpen(true)
             }}
                 onContextMenu={(event: any) => {
-                    // event.preventDefault()
-                    // setIsOpen(true)
+                    event.preventDefault()
+                    setIsOpen(true)
                     console.log("event2", event)
                     return false
                 }}
+                // onLoad={()=>loaded()}
+                
                 src={url}
                 alt="card"
-                className={"a " + ( ready ? "" : "unready")}
+                className={"a " + ( ready ? "" : "unready ") + ( affordable ? "" : "costly")}
             ></img>
             <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
                     <DialogPanel className={"max-w-lg space-y-4 border bg-white p-12 card-modal card-color-" + aspectColor}>
-                        {/* <DialogTitle className="font-bold">Deactivate account</DialogTitle>
-                        <Description>This will permanently deactivate your account</Description> */}
+                        <DialogTitle className="text-white">{uid}</DialogTitle>
+                        {/* <Description>This will permanently deactivate your account</Description> */}
                         {/* <p>Are you sure you want to deactivate your account? All of your data will be permanently removed.</p> */}
                         <img
                             src={url}

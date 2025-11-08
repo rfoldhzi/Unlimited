@@ -180,6 +180,31 @@ export class GameClass implements Game {
         player.hand.push(cardUid)
     }
 
+    public calculateCardCost(card: CardActive, playerId: PlayerID): number {
+        let cost = card.cost;
+
+        let aspectPenalty = 0;
+        let cardAspects = card.aspectCost;
+        let ownedAspects = []
+        let player = this.players[playerId]!
+        player.leaders.forEach((leader: Leader) => {
+            leader.aspects.forEach((aspect: Aspect) => ownedAspects.push(aspect))
+        })
+        ownedAspects.push(player.base.aspect)
+
+
+        cardAspects.forEach((aspect: Aspect) => {
+            let index = ownedAspects.indexOf(aspect)
+            if (index == -1) {
+                aspectPenalty += 2
+            } else {
+                ownedAspects.splice(index,1)
+            }
+        });
+        
+        return cost + aspectPenalty
+    }
+
     /**
      * ACTION
      * 
@@ -198,8 +223,17 @@ export class GameClass implements Game {
         if (card == null) {
             return
         }
+
+        let cost = this.calculateCardCost(card, playerId)
+        if (cost > player.resourcesRemaining) {
+            console.log("Cannot play card: Too expensive! Cost:", cost, "Resources:", player.resourcesRemaining)
+            return
+        }
+
+        player.resourcesRemaining -= cost
+
         console.log("playCard2")
-        card.ready = true; //TODO change to false
+        card.ready = false; 
         card.ownerID = playerId;
         card.controllerID = playerId;
 
