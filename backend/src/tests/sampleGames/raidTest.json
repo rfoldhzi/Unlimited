@@ -1,0 +1,259 @@
+{
+    "gameID": 0,
+    "cardCount": 7,
+    "players": {
+        "0": {
+            "playerID": "0",
+            "base": {
+                "cardUid": "0507674993",
+                "aspect": "Command",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "6088773439",
+                    "aspects": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "3851011404",
+                "9655836052",
+                "0097256640",
+                "4843225228",
+                "9655836052",
+                "2657417747",
+                "8746311599"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 3,
+                    "cardUid": "9655836052"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 6,
+                    "cardUid": "2657417747"
+                }
+            ],
+            "deck": [
+                "4843225228",
+                "4100796757",
+                "4100796757",
+                "9127322562",
+                "6867378216",
+                "0097256640",
+                "8746311599",
+                "7227136692",
+                "6867378216",
+                "1087522061",
+                "4843225228",
+                "1087522061",
+                "1557302740",
+                "4328408486",
+                "4328408486",
+                "8954587682",
+                "3347454174",
+                "8986035098",
+                "8746311599",
+                "7227136692",
+                "3851011404",
+                "9127322562",
+                "3347454174",
+                "4100796757",
+                "1557302740",
+                "2529211493",
+                "2657417747",
+                "0097256640",
+                "8954587682",
+                "9127322562",
+                "8986035098",
+                "2529211493",
+                "1557302740",
+                "2529211493",
+                "3347454174",
+                "4328408486",
+                "1087522061",
+                "8986035098",
+                "3851011404",
+                "8954587682"
+            ],
+            "groundArena": [],
+            "spaceArena": [
+                {
+                    "cardID": 1,
+                    "cardUid": "6867378216",
+                    "name": "Scouting TIE Fighter",
+                    "hp": 2,
+                    "power": 2,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Villainy"
+                    ],
+                    "ownerID": "0",
+                    "damage": 1,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_I01010075_EN_Scouting_TIE_Fighter_9fa35312d1.png",
+                    "controllerID": "0",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 1
+                }
+            ],
+            "discard": [],
+            "totalResources": 4,
+            "resourcesRemaining": 4,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
+                "cardUid": "0507674993",
+                "aspect": "Command",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "6088773439",
+                    "aspects": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "4328408486",
+                "0097256640",
+                "8746311599",
+                "8954587682",
+                "1087522061",
+                "8986035098"
+            ],
+            "resources": [
+                {
+                    "ownerID": "1",
+                    "cardID": 4,
+                    "cardUid": "1557302740"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 7,
+                    "cardUid": "9655836052"
+                }
+            ],
+            "deck": [
+                "8746311599",
+                "8986035098",
+                "4328408486",
+                "6867378216",
+                "3851011404",
+                "3851011404",
+                "9655836052",
+                "2529211493",
+                "2657417747",
+                "1087522061",
+                "3851011404",
+                "4328408486",
+                "3347454174",
+                "8954587682",
+                "8746311599",
+                "1557302740",
+                "1087522061",
+                "4100796757",
+                "9127322562",
+                "3347454174",
+                "1557302740",
+                "9127322562",
+                "0097256640",
+                "3347454174",
+                "6867378216",
+                "2657417747",
+                "4843225228",
+                "4843225228",
+                "2657417747",
+                "2529211493",
+                "7227136692",
+                "4843225228",
+                "4100796757",
+                "8954587682",
+                "0097256640",
+                "7227136692",
+                "8986035098",
+                "9655836052",
+                "2529211493",
+                "9127322562"
+            ],
+            "groundArena": [],
+            "spaceArena": [
+                {
+                    "cardID": 2,
+                    "cardUid": "4100796757",
+                    "name": "Surface Assault Bomber",
+                    "hp": 3,
+                    "power": 1,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_I01010093_EN_Surface_Assault_Bomber_cdd6751a55.png",
+                    "controllerID": "1",
+                    "upgrades": [],
+                    "keywords": [
+                        {
+                            "keyword": 0,
+                            "number": 1
+                        }
+                    ],
+                    "arena": 1
+                },
+                {
+                    "cardID": 5,
+                    "cardUid": "6867378216",
+                    "name": "Scouting TIE Fighter",
+                    "hp": 2,
+                    "power": 2,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Villainy"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_I01010075_EN_Scouting_TIE_Fighter_9fa35312d1.png",
+                    "controllerID": "1",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 1
+                }
+            ],
+            "discard": [],
+            "totalResources": 4,
+            "resourcesRemaining": 4,
+            "finished": false,
+            "cardsToResource": 0
+        }
+    },
+    "name": "Cloud",
+    "initiative": "1",
+    "turn": "0",
+    "phase": 0,
+    "initiativeClaimed": false,
+    "subPhase": 0,
+    "targets": []
+}
