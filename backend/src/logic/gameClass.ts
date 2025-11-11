@@ -1,5 +1,5 @@
 import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase } from "../models/game";
-import { Ability, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, KeyWordAbilites, Trigger, Upgrade, UpgradeCardIDAbilities } from "./abilities";
+import { Ability, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, KeyWordAbilites, TokenUnit, Trigger, Upgrade, UpgradeCardIDAbilities } from "./abilities";
 import { createCard } from "./gameHandler";
 
 export class GameClass {
@@ -588,5 +588,27 @@ export class GameClass {
             max: maxTargets,
         };
         this.data.subPhase = SubPhase.TARGET;
+    }
+
+    public async createTokenUnit(tokenUnit: TokenUnit, playerId: PlayerID) {
+        
+        let player = this.players[playerId]!
+        let card = await createCard(tokenUnit)
+        if (card == null) {
+            return
+        }
+        
+        card.ownerID = playerId;
+        card.controllerID = playerId;
+
+        this.data.cardCount += 1;
+        card.cardID = this.data.cardCount;
+
+        if (card.arena == Arena.GROUND) {
+            player.groundArena.push(card)
+        } else if (card.arena == Arena.SPACE) {
+            player.spaceArena.push(card)
+        }
+        
     }
 }

@@ -97,6 +97,9 @@ export interface Upgrade {
     keyword?: CardKeyword,
 }
 
+export enum TokenUnit {
+    CLONE_TROOPER = "3941784506",
+}
 
 
 export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
