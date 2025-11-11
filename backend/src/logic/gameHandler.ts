@@ -1,4 +1,5 @@
-import { Arena, Aspect, Base, CardActive, CardUID, Game, games, Leader, Phase, PlayerState } from "../models/game"
+import { Arena, Aspect, Base, CardActive, CardUID, Game, games, Leader, Phase, PlayerState, SubPhase } from "../models/game"
+import { CardIDKeywords } from "./abilities";
 const https = require('https');
 
 let deckCodes = [
@@ -101,7 +102,7 @@ export async function importDeck(code: string, player: PlayerState, randomize?: 
     player.leaders = leaders;
 }
 
-async function fetchCard(cardUid: CardUID) {
+export async function fetchCard(cardUid: CardUID) {
     let result = await new Promise((resolve, reject) => {
         https.get(`https://admin.starwarsunlimited.com/api/card/${cardUid}`, (res: any) => {
             let output = '';
@@ -135,7 +136,7 @@ async function fetchCard(cardUid: CardUID) {
 export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
     let data: any = await fetchCard(cardUid)
     data = data.data.data
-    console.log("data",data)
+    // console.log("data",data)
     if (data == null) {
         console.log("Data is null...?")
         return null
@@ -152,7 +153,14 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
         damage: 0,
         ready: true,
         imgURL: data.attributes.artFront.data.attributes.formats.card.url,
-        controllerID: "0"
+        controllerID: "0",
+        upgrades: [],
+        keywords: []
+    }
+    if (cardUid in CardIDKeywords) {
+        for (let cardKeyword of CardIDKeywords[cardUid]!) {
+            card.keywords.push(cardKeyword)
+        }
     }
     if (data.attributes.arenas.data.find((item: any) => item.attributes.name == "Ground")) {
         card.arena = Arena.GROUND
@@ -225,7 +233,9 @@ export const createSampleGame = async (): Promise<Game> => {
         turn: "0",
         phase: Phase.ACTION,
         initiativeClaimed: false,
-        winner: undefined,
+        subPhase: SubPhase.TURN,
+        targets: [],
+        playedCard: undefined,
     }
     return game
 }

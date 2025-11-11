@@ -1,29 +1,34 @@
-import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource } from "../models/game";
+import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase } from "../models/game";
+import { Ability, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, KeyWordAbilites, Trigger, Upgrade, UpgradeCardIDAbilities } from "./abilities";
 import { createCard } from "./gameHandler";
 
-export class GameClass implements Game {
-    gameID: number;
+export class GameClass {
+    // gameID: number;
     players: { [playerID: string]: PlayerState; };
-    name: string;
-    initiative: PlayerID | null;
-    cardCount: number;
+    // name: string;
+    // initiative: PlayerID | null;
+    // cardCount: number;
     data: Game;
-    phase: Phase;
-    turn: PlayerID;
-    initiativeClaimed: boolean;
-    winner: PlayerID | undefined;
+    // phase: Phase;
+    // turn: PlayerID;
+    // initiativeClaimed: boolean;
+    // winner?: PlayerID;
+    // subPhase: SubPhase;
+    // targets: any[];
+    targetCount?: { min: Number; max: Number; };
 
     public constructor(data: Game) {
         this.data = data
-        this.gameID = data.gameID;
+        // this.gameID = data.gameID;
         this.players = data.players;
-        this.name = data.name;
-        this.initiative = data.initiative
-        this.cardCount = data.cardCount
-        this.phase = data.phase;
-        this.turn = data.turn;
-        this.initiativeClaimed = data.initiativeClaimed;
-        this.winner = data.winner;
+        // this.name = data.name;
+        // this.initiative = data.initiative
+        // this.cardCount = data.cardCount
+        // this.phase = data.phase;
+        // this.turn = data.turn;
+        // this.initiativeClaimed = data.initiativeClaimed;
+        // this.subPhase = data.subPhase;
+        // this.targets = data.targets;
     }
 
     /**
@@ -121,13 +126,53 @@ export class GameClass implements Game {
             return
         }
 
+        let attackData = {
+            attacker: attacker,
+            defender: defender,
+        }
+        let cancel = this.triggerAbility(Trigger.CHECK_UNIT_ATTACK, attackData)
+        if (cancel) {
+            console.log("ability canceled the attack")
+            return
+        }
+        this.triggerAbility(Trigger.UNIT_ATTACK, attackData)
+        
+
         attacker.ready = false
-        attacker.damage += defender.power
-        defender.damage += attacker.power
+
+        let attackerData = {
+            dealer: attacker,
+            attacker: attacker,
+            defender: defender,
+            amount: attacker.power
+        }
+
+        cancel = this.triggerAbility(Trigger.DEAL_DAMAGE, attackerData)
+        if (cancel !== true) {
+            defender.damage += attackerData.amount // Here we can expect the data to change with the ability
+            this.triggerAbility(Trigger.DAMAGE_CHANGES, {card: defender})
+            this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+        }
+
+
+        let defenderData = {
+            dealer: defender,
+            attacker: attacker,
+            defender: defender,
+            amount: defender.power
+        }
+        cancel = this.triggerAbility(Trigger.DEAL_DAMAGE, defenderData)
+        if (cancel !== true) {
+            attacker.damage += defenderData.amount // Here we can expect the data to change with the ability
+            this.triggerAbility(Trigger.DAMAGE_CHANGES, {card: attacker})
+            this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+        }
 
         if (attacker.damage >= attacker.hp) this.defeatCard(attacker)
         if (defender.damage >= defender.hp) this.defeatCard(defender)
     
+        this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+
         await this.endTurn()
     }
 
@@ -166,11 +211,25 @@ export class GameClass implements Game {
             return
         }
 
+        let attackData = {
+            attacker: attacker,
+            defenderPlayerID: defenderPlayerID,
+        }
+        let cancel = this.triggerAbility(Trigger.CHECK_BASE_ATTACK, attackData)
+        if (cancel) {
+            console.log("ability canceled the attack")
+            return
+        }
+        this.triggerAbility(Trigger.BASE_ATTACK, attackData)
+
         attacker.ready = false
         defenderBase.damage += attacker.power
 
         if (defenderBase.damage >= defenderBase.hp) this.victory(playerID)
     
+        
+        this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+
         await this.endTurn()
     }
 
@@ -201,8 +260,16 @@ export class GameClass implements Game {
                 ownedAspects.splice(index,1)
             }
         });
+
+
+        let costData = {
+            card: card,
+            amount: cost + aspectPenalty,
+        }
+        this.triggerAbility(Trigger.CALC_COST, costData)
         
-        return cost + aspectPenalty
+        if (costData.amount < 0) return 0
+        return costData.amount
     }
 
     /**
@@ -219,14 +286,23 @@ export class GameClass implements Game {
         }
 
         console.log("playCard1")
+        let player = this.players[playerId]!
         let card = await createCard(cardUid)
         if (card == null) {
             return
         }
+        
+        card.ownerID = playerId;
+        card.controllerID = playerId;
+
+        this.data.cardCount += 1;
+        card.cardID = this.data.cardCount;
+        this.data.playedCard = card;
 
         let cost = this.calculateCardCost(card, playerId)
         if (cost > player.resourcesRemaining) {
             console.log("Cannot play card: Too expensive! Cost:", cost, "Resources:", player.resourcesRemaining)
+            this.data.playedCard = undefined
             return
         }
 
@@ -234,14 +310,8 @@ export class GameClass implements Game {
 
         console.log("playCard2")
         card.ready = false; 
-        card.ownerID = playerId;
-        card.controllerID = playerId;
-
-        this.data.cardCount += 1;
-        card.cardID = this.data.cardCount;
 
         // find card in player's hand
-        let player = this.players[playerId]!
         console.log("PLYER", player, player.hand, cardUid)
         let index = player.hand.indexOf(cardUid)
         if (index != -1) {
@@ -249,6 +319,7 @@ export class GameClass implements Game {
         } else {
             console.log("cannot find card in hand")
             // we cant play the card
+            this.data.playedCard = undefined
             return
         }
         
@@ -258,11 +329,20 @@ export class GameClass implements Game {
         } else if (card.arena == Arena.SPACE) {
             player.spaceArena.push(card)
         }
+        this.data.playedCard = undefined
+
+        let costData = {
+            card: card,
+        }
+        this.triggerAbility(Trigger.CALC_COST, costData)
 
         await this.endTurn()
     }
 
     public async regroup() {
+        
+        this.upgradeRemoval(EffectDuraction.END_OF_PHASE);
+
         this.data.phase = Phase.REGROUP
         this.data.initiativeClaimed = false
         for (let playerID in this.players) {
@@ -382,6 +462,8 @@ export class GameClass implements Game {
 
     public async endTurn() {
         console.log("end turn called")
+        this.data.playedCard = undefined;
+
         let allPlayersFinished = true;
         for (let playerID in this.players) {
             let player = this.players[playerID]!
@@ -414,5 +496,97 @@ export class GameClass implements Game {
         }
         console.log("turn Order3", turnOrder, i, turnOrder[i])
         console.log("went through all players, couldn't find one ready??")
+    }
+
+    public async applyUpgrade(card: CardActive, upgrade: Upgrade) {
+        card.upgrades.push(upgrade);
+        card.power += upgrade.power;
+        card.hp += upgrade.hp;
+    }
+
+    public getEveryUnit(): CardActive[] {
+        let unitList: CardActive[] = []
+        for (let playerID in this.players) {
+            let player = this.players[playerID]!
+            for (let c of player.groundArena) {
+                unitList.push(c)
+            }
+            for (let c of player.spaceArena) {
+                unitList.push(c)
+            }
+        }
+        return unitList
+    }
+
+    public triggerAbility(trigger: Trigger, data?: any) {
+        let cards = this.getEveryUnit();
+        if (this.data.playedCard) {
+            cards.push(this.data.playedCard)
+        }
+        for (let card of cards) {
+            // Trigger keyword abilities
+            for (let keyword of card.keywords) {
+                for (let ability of KeyWordAbilites[keyword.keyword]) {
+                    if (ability.trigger == trigger) {
+                        let output = ability.effect(card, this, data, keyword.number)
+                        if (output !== undefined) return output
+                    }
+                }
+            }
+            for (let upgrade of card.upgrades) {
+                //Trigger card specific upgrade abilities
+                if (UpgradeCardIDAbilities[upgrade.abilityID || ""]) { // Find ability based on id of card that created the upgrade
+                    for (let ability of UpgradeCardIDAbilities[upgrade.abilityID!]!) {
+                        if (ability.trigger == trigger) {
+                            let output = ability.effect(card, this, data)
+                            if (output !== undefined) return output
+                        }
+                    }
+                }
+                // Trigger abilities of keywords on upgrades
+                if (upgrade.keyword) {
+                    for (let ability of KeyWordAbilites[upgrade.keyword.keyword]) {
+                        if (ability.trigger == trigger) {
+                            let output = ability.effect(card, this, data, upgrade.keyword.number)
+                            if (output !== undefined) return output
+                        }
+                    }
+                }
+            }
+            // Trigger card specific abilities
+            if (CardIDAbilities[card.cardUid]) {
+                for (let ability of CardIDAbilities[card.cardUid]!) {
+                    if (ability.trigger == trigger) {
+                        let output = ability.effect(card, this, data)
+                        if (output !== undefined) return output
+                    }
+                }
+            }
+        }
+    }
+
+    public upgradeRemoval(duration: EffectDuraction) {
+        let cards = this.getEveryUnit();
+        cards.forEach((card: CardActive) => {
+            let i = card.upgrades.length - 1
+            while (i >= 0) {
+                let upgrade = card.upgrades[i]
+                if (upgrade?.duration == duration) {
+                    card.upgrades.splice(i, 1)
+                    card.power -= upgrade.power
+                    card.hp -= upgrade.hp
+                }
+                i--
+            }
+        })
+    }
+
+    //TODO finish
+    public async targetAbility(minTargets: number, maxTargets: number) {
+        this.data.targetCount = {
+            min: minTargets,
+            max: maxTargets,
+        };
+        this.data.subPhase = SubPhase.TARGET;
     }
 }

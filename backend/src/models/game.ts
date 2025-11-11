@@ -1,10 +1,12 @@
+import { CardKeyword, Upgrade } from "../logic/abilities";
+
 export enum Aspect {
-    VIGILANCE,
-    COMMAND,
-    AGGRESSION,
-    CUNNING,
-    HEROISM,
-    VILLANY,
+    VIGILANCE = "Vigilance",
+    COMMAND = "Command",
+    AGGRESSION = "Aggression",
+    CUNNING = "Cunning",
+    HEROISM = "Heroism",
+    VILLANY = "Villany",
 }
 export enum Arena {
     GROUND,
@@ -16,6 +18,11 @@ export enum Phase {
     REGROUP,
     SETUP,
     GAME_OVER,
+}
+
+export enum SubPhase {
+    TURN,
+    TARGET,
 }
 
 
@@ -55,6 +62,7 @@ export interface CardStats extends CardBasic {
     aspectCost: Aspect[],
     imgURL?: string,
     arena?: Arena,
+    keywords: CardKeyword[]
 }
 
 export interface CardActive extends CardStats {
@@ -63,6 +71,7 @@ export interface CardActive extends CardStats {
     ready: boolean,
     ownerID: PlayerID,
     controllerID: PlayerID,
+    upgrades: Upgrade[],
 }
 
 export interface PlayerState {
@@ -89,8 +98,15 @@ export interface Game {
     initiative: PlayerID | null;
     initiativeClaimed: boolean;
     phase: Phase;
+    subPhase: SubPhase;
+    targets: any[];
+    targetCount?: {
+        min: Number,
+        max: Number,
+    }
     cardCount: number,
-    winner: PlayerID | undefined,
+    winner?: PlayerID,
+    playedCard?: CardActive | undefined;
 }
 
 export let games: Game[] = [];
