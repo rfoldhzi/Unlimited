@@ -293,6 +293,18 @@ export const CardIDKeywords: {[key in CardUID]: CardKeyword[]} = {
             number: 0
         }
     ],
+    ["7983965297"]: [ // Defense Fleet X-Wing
+        { keyword: Keyword.SENTINAL, number: 0}
+    ],
+    ["7504035101"]: [ // Loth-Wolf
+        { keyword: Keyword.SENTINAL, number: 0}
+    ],
+    ["7742118411"]:  [ // Vulptex
+        { keyword: Keyword.HIDDEN, number: 0}
+    ],
+    ["6930799884"]:  [ // A-Wing
+        { keyword: Keyword.RAID, number: 1}
+    ],
 }
 
 
@@ -313,6 +325,30 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
             }
         }
     ],
+    ["8401089833"]: [ // Rebellion Y-Wing
+        {
+            trigger: Trigger.UNIT_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                let attackerID: CardID = data.attackerID;
+                let defenderID: CardID = data.defenderID;
+                if (attackerID != thisCard.cardID) return;
+                let defender: CardActive = game.findUnitAnyPlayer(defenderID)!;
+
+                // TODO Multiplayer Fix (could be any base)
+                let defenderPlayerID = defender.controllerID
+                game.players[defenderPlayerID]!.base.damage += 1
+            }
+        },
+        {
+            trigger: Trigger.BASE_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                let attackerID: CardID = data.attackerID;
+                if (attackerID != thisCard.cardID) return;
+                let defenderPlayerID: PlayerID = data.defenderPlayerID
+                game.players[defenderPlayerID]!.base.damage += 1
+            }
+        }
+    ]
 }
 
 

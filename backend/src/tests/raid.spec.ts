@@ -60,4 +60,11 @@ describe('Raid Tester', () => {
         expect(tieBomber).toBeTruthy()
         expect(tieBomber?.power).toBe(1)
     })
+
+    it("should ignore invalid action requests", async () => {
+        let gameClass = getGame()
+        expect(gameClass.data.turn).toBe("0")
+        await gameClass.attackBase("1", 2, "0") // invalid attack. Turn is "0"
+        expect(gameClass.data.turn).toBe("0")
+    })
 })

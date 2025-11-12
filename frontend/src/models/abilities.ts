@@ -44,6 +44,16 @@ export enum Keyword {
     SENTINAL,
     AMBUSH, 
     GRIT,
+    HIDDEN,
+    UNATTACKABLE,
+}
+
+export interface Upgrade {
+    power: number,
+    hp: number,
+    duration: EffectDuraction,
+    abilityID?: CardUID,
+    keyword?: CardKeyword,
 }
 
 export interface CardKeyword {

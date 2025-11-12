@@ -85,6 +85,16 @@
     opacity: 0.4;
 }
 
+.unattackable {
+    border: 4px dashed #af14ff;
+}
+
+.sentinal {
+    box-sizing: border-box;
+    outline: 3px solid red;
+    border-radius: 4px;
+}
+
 @keyframes show {
   100% {
     /* opacity: 1; */

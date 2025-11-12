@@ -1,0 +1,203 @@
+{
+    "gameID": 0,
+    "cardCount": 9,
+    "players": {
+        "0": {
+            "playerID": "0",
+            "base": {
+                "cardUid": "2376813177",
+                "aspect": "Cunning",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "8304104587",
+                    "aspects": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "9430527677",
+                "6523135540",
+                "9213315483",
+                "1162729042",
+                "6930799884",
+                "3842468148",
+                "8401089833"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 1,
+                    "cardUid": "3591040205"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 3,
+                    "cardUid": "7249575408"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 9,
+                    "cardUid": "5572220841"
+                }
+            ],
+            "deck": [
+                "7504035101",
+                "6930799884",
+                "7249575408",
+                "7298144465"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 5,
+                    "cardUid": "7504035101",
+                    "name": "Loth-Wolf",
+                    "hp": 3,
+                    "power": 3,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_05010044_EN_Loth_Wolf_278b8954fd.png",
+                    "controllerID": "0",
+                    "upgrades": [],
+                    "keywords": [
+                        {
+                            "keyword": 2,
+                            "number": 0
+                        }
+                    ],
+                    "arena": 0
+                },
+                {
+                    "cardID": 7,
+                    "cardUid": "9394156877",
+                    "name": "Dhani Pilgrim",
+                    "hp": 3,
+                    "power": 1,
+                    "cost": 1,
+                    "aspectCost": [
+                        "Vigilance"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010055_EN_Dhani_Pilgrim_69154b8875.png",
+                    "controllerID": "0",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 5,
+            "resourcesRemaining": 5,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
+                "cardUid": "2376813177",
+                "aspect": "Cunning",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "8304104587",
+                    "aspects": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "8613908567",
+                "6930799884",
+                "1162729042",
+                "7298144465",
+                "7742118411",
+                "1162729042",
+                "7983965297",
+                "6930799884"
+            ],
+            "resources": [
+                {
+                    "ownerID": "1",
+                    "cardID": 2,
+                    "cardUid": "2508430135"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 4,
+                    "cardUid": "5572220841"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 8,
+                    "cardUid": "5572220841"
+                }
+            ],
+            "deck": [
+                "3842468148",
+                "6523135540",
+                "9430527677",
+                "9394156877",
+                "2508430135"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 6,
+                    "cardUid": "3842468148",
+                    "name": "Hoth Trooper",
+                    "hp": 3,
+                    "power": 2,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Cunning",
+                        "Heroism"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_I01010038_EN_Hoth_Trooper_dbbbff9f1e.png",
+                    "controllerID": "1",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 5,
+            "resourcesRemaining": 5,
+            "finished": false,
+            "cardsToResource": 0
+        }
+    },
+    "name": "Cloud",
+    "initiative": "0",
+    "turn": "0",
+    "phase": 0,
+    "initiativeClaimed": false,
+    "subPhase": 0,
+    "targets": [],
+    "heap": [],
+    "stack": []
+}

@@ -1,0 +1,275 @@
+{
+    "gameID": 0,
+    "cardCount": 30,
+    "players": {
+        "0": {
+            "playerID": "0",
+            "base": {
+                "cardUid": "2376813177",
+                "aspect": "Cunning",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "8304104587",
+                    "aspects": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "8401089833",
+                "6930799884",
+                "7983965297",
+                "3469756679",
+                "5572220841",
+                "2508430135"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 3,
+                    "cardUid": "5572220841"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 5,
+                    "cardUid": "7249575408"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 8,
+                    "cardUid": "9430527677"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 10,
+                    "cardUid": "2404240951"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 26,
+                    "cardUid": "9394156877"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 28,
+                    "cardUid": "2508430135"
+                }
+            ],
+            "deck": [
+                "8613908567",
+                "7742118411",
+                "7983965297",
+                "7298144465",
+                "3591040205",
+                "7504035101"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 1,
+                    "cardUid": "3842468148",
+                    "name": "Hoth Trooper",
+                    "hp": 3,
+                    "power": 2,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Cunning",
+                        "Heroism"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_I01010038_EN_Hoth_Trooper_dbbbff9f1e.png",
+                    "controllerID": "0",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                },
+                {
+                    "cardID": 30,
+                    "cardUid": "7742118411",
+                    "name": "Vulptex",
+                    "hp": 2,
+                    "power": 3,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Heroism"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": false,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_05010245_EN_Vulptex_4c37969f34.png",
+                    "controllerID": "0",
+                    "upgrades": [
+                        {
+                            "power": 0,
+                            "hp": 0,
+                            "duration": 1,
+                            "keyword": {
+                                "keyword": 6,
+                                "number": 0
+                            }
+                        }
+                    ],
+                    "keywords": [
+                        {
+                            "keyword": 5,
+                            "number": 0
+                        }
+                    ],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 15,
+            "resourcesRemaining": 13,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
+                "cardUid": "2376813177",
+                "aspect": "Cunning",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "8304104587",
+                    "aspects": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "7298144465",
+                "9430527677",
+                "1162729042",
+                "7983965297",
+                "5572220841",
+                "7249575408",
+                "2404240951",
+                "7504035101",
+                "0726963200",
+                "8613908567",
+                "2508430135",
+                "5663262393",
+                "8613908567",
+                "7504035101",
+                "7298144465",
+                "3842468148",
+                "0726963200"
+            ],
+            "resources": [
+                {
+                    "ownerID": "1",
+                    "cardID": 4,
+                    "cardUid": "7249575408"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 6,
+                    "cardUid": "6523135540"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 7,
+                    "cardUid": "5572220841"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 27,
+                    "cardUid": "6930799884"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 29,
+                    "cardUid": "9394156877"
+                }
+            ],
+            "deck": [
+                "7742118411",
+                "8401089833",
+                "2508430135",
+                "6930799884",
+                "6523135540",
+                "8401089833",
+                "3591040205"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 2,
+                    "cardUid": "3842468148",
+                    "name": "Hoth Trooper",
+                    "hp": 3,
+                    "power": 2,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Cunning",
+                        "Heroism"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_I01010038_EN_Hoth_Trooper_dbbbff9f1e.png",
+                    "controllerID": "1",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                },
+                {
+                    "cardID": 9,
+                    "cardUid": "7504035101",
+                    "name": "Loth-Wolf",
+                    "hp": 3,
+                    "power": 3,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_05010044_EN_Loth_Wolf_278b8954fd.png",
+                    "controllerID": "1",
+                    "upgrades": [],
+                    "keywords": [
+                        {
+                            "keyword": 2,
+                            "number": 0
+                        }
+                    ],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 15,
+            "resourcesRemaining": 15,
+            "finished": false,
+            "cardsToResource": 0
+        }
+    },
+    "name": "Cloud",
+    "initiative": "0",
+    "turn": "1",
+    "phase": 0,
+    "initiativeClaimed": false,
+    "subPhase": 0,
+    "targets": [],
+    "heap": [],
+    "stack": []
+}

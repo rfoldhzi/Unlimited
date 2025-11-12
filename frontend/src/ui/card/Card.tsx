@@ -3,6 +3,7 @@ import type { Aspect, CardActive, CardStats, CardUID } from "../../models/game.t
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { useState } from 'react'
 import "./Card.css"
+import { Keyword, type CardKeyword, type Upgrade } from "../../models/abilities.ts";
 
 interface Props {
     card: CardUID | CardActive,
@@ -24,6 +25,8 @@ export default function Card({ card, clickFunction, cardArea, resources, ownedAs
     let damage: string = ""
     let ready = true
     let affordable = true
+    let sentinal = false
+    let unattackable = false
 
     let [isOpen, setIsOpen] = useState(false)
     const { data, setValue } = useCardLookUp();
@@ -55,11 +58,21 @@ export default function Card({ card, clickFunction, cardArea, resources, ownedAs
         }
     } else {
         url = card.imgURL!
+        uid = card.cardUid;
         aspectColor = card.aspectCost[0] || "" as any
         ready = card.ready
         if (card.damage > 0) {
             damage = String(card.damage)
         }
+        if (card.keywords.find((item: CardKeyword) => item.keyword == Keyword.SENTINAL))
+            sentinal = true
+        if (card.upgrades.find((item: Upgrade) => item.keyword?.keyword == Keyword.SENTINAL))
+            unattackable = true
+
+        if (card.keywords.find((item: CardKeyword) => item.keyword == Keyword.UNATTACKABLE))
+            unattackable = true
+        if (card.upgrades.find((item: Upgrade) => item.keyword?.keyword == Keyword.UNATTACKABLE))
+            unattackable = true
     }
 
     // If card is CardActive, new check
@@ -91,7 +104,11 @@ export default function Card({ card, clickFunction, cardArea, resources, ownedAs
                 
                 src={url}
                 alt="card"
-                className={"a " + ( ready ? "" : "unready ") + ( affordable ? "" : "costly")}
+                className={"a" + (ready ? "" : " unready")
+                    + (affordable ? "" : " costly")
+                    + (sentinal ? " sentinal" : "")
+                    + (unattackable ? " unattackable" : "")
+                }
             ></img>
             <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4">

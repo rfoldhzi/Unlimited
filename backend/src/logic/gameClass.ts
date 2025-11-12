@@ -59,48 +59,95 @@ export class GameClass {
     private handleReturn(returnValue: ReturnTrigger): boolean {
         return returnValue != ReturnTrigger.CONTINUE
     }
+    /**
+     * Store local variables of a function here
+     * @returns object
+     */
     private heap(): any {
         return this.data.heap![0]
     }
+    /**
+     * Only used when by stack creation helper methods
+     */
     private newHeap(): void {
         this.data.heap.unshift({})
     }
+    /**
+     * Basically input function parameters as an object
+     * @returns Any format
+     */
     private getInput(): any {
         if (Array.isArray(this.data.stack[0])) {
             return this.data.stack[0][0]!.input
         }
         return this.data.stack[0]!.input
     }
+    /**
+     * Get output from child stack item
+     * @returns any formart
+     */
     private getChildOutput(): any {
         if (Array.isArray(this.data.stack[0])) {
             return this.data.stack[0][0]!.childOutput
         }
         return this.data.stack[0]!.childOutput
     }
+    /**
+     * Output returned to parent stack item
+     * @param output 
+     */
     private setOutput(output: any): void {
         if (Array.isArray(this.data.stack[1])) {
             this.data.stack[1][0]!.childOutput = output
         }
         (this.data.stack[1]! as StackItem).childOutput = output
     }
+
+    /**
+     * Input data for abilities. Refer to Trigger Enum for format data
+     * @param data format depends on Trigger Enum
+     */
     public setTriggerData(data: any) {
         if (Array.isArray(this.data.stack[0])) {
             this.data.stack[0][0]!.triggerData = data
         }
         (this.data.stack[0]! as StackItem).triggerData = data
     }
+
+
+    /**
+     * Gets triggerData from self. Useful to see if abilities changed any data
+     * @returns triggerData
+     */
     public getTriggerData(): any {
         if (Array.isArray(this.data.stack[0])) {
             return this.data.stack[0][0]!.triggerData
         }
         return this.data.stack[0]!.triggerData
     }
+
+    /**
+     * Gets trigger data from parent stack item. Used for abilities
+     * @returns triggerData
+     */
     public getParentTriggerData(): any {
         if (Array.isArray(this.data.stack[1])) {
             return this.data.stack[1][0]!.triggerData
         }
         return this.data.stack[1]!.triggerData
     }
+    /**
+     * Set parent's return trigger data
+     * @param returnTrigger 
+     */
+    public setTriggerReturn(returnTrigger: ReturnTrigger): void {
+        if (this.getParentTriggerData())
+            this.getParentTriggerData().triggerReturn = returnTrigger
+    }
+    /**
+     * Gets ReturnTrigger from last child stack call
+     * @returns 
+     */
     public getTriggerReturn(): ReturnTrigger | undefined {
         if (this.getTriggerData())
             return this.getTriggerData().triggerReturn
@@ -197,33 +244,33 @@ export class GameClass {
         if (!attacker) {
             console.log("attacker", attacker)
             console.log("defender", defender)
-            console.log("Declined Attack: Can't find attacker")
-            this.releaseStack()
-            return
+            console.log("Declined Attack: Can't find attacker ._.")
+            this.setOutput(ReturnTrigger.CANCEL)
+            return this.releaseStack()
         }
         if (!defender) {
-            console.log("Declined Attack: Can't find defender")
-            this.releaseStack()
-            return
+            console.log("Declined Attack: Can't find defender ._.")
+            this.setOutput(ReturnTrigger.CANCEL)
+            return this.releaseStack()
         }
 
         if (this.getStep() == ExecutionStep.NONE) {
 
             if (this.data.turn != playerID) {
                 console.log("Cannot attack: Not this player's turn!")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
 
             if (attacker.controllerID == defender.controllerID) {
                 console.log("Declined Attack: Can't attack card on same team")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
             if (!attacker.ready) {
                 console.log("Declined Attack: Attacker must be ready")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
             this.setStep(ExecutionStep.CHECK_ATTACK)
             this.setTriggerData({
@@ -238,8 +285,8 @@ export class GameClass {
             console.log("CHECK ATTACK")
             if (this.getTriggerReturn() == ReturnTrigger.CANCEL) {
                 console.log("attack canceled")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
             
             this.setStep(ExecutionStep.ATTACK)
@@ -265,7 +312,6 @@ export class GameClass {
             })
             console.log("triggered deal damage, step is",this.getStep()) 
             this.triggerAbility(Trigger.DEAL_DAMAGE)
-            
             return
         }
 
@@ -316,8 +362,7 @@ export class GameClass {
             if (defender.damage >= defender.hp) await this.defeatCard(defender)
 
             this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
-            this.releaseStack()
-            return
+            return this.releaseStack()
         }
     }
 
@@ -351,33 +396,33 @@ export class GameClass {
 
         if (!attacker) {
             console.log("attacker", attacker)
-            console.log("Declined Attack: Can't find attacker")
-            this.releaseStack()
-            return
+            console.log("Declined Attack: Can't find attacker ._.")
+            this.setOutput(ReturnTrigger.CANCEL)
+            return this.releaseStack()
         }
         if (!defenderBase) {
-            console.log("Declined Attack: Can't find defenderBase")
-            this.releaseStack()
-            return
+            console.log("Declined Attack: Can't find defenderBase ._.")
+            this.setOutput(ReturnTrigger.CANCEL)
+            return this.releaseStack()
         }
 
         if (this.getStep() == ExecutionStep.NONE) {
 
             if (this.data.turn != playerID) {
                 console.log("Cannot attack: Not this player's turn!")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
 
             if (attacker.controllerID == defenderPlayerID) {
                 console.log("Declined Attack: Can't attack base on same team")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
             if (!attacker.ready) {
                 console.log("Declined Attack: Attacker must be ready")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
             this.setStep(ExecutionStep.CHECK_ATTACK)
             this.setTriggerData({
@@ -392,8 +437,8 @@ export class GameClass {
             console.log("CHECK ATTACK")
             if (this.getTriggerReturn() == ReturnTrigger.CANCEL) {
                 console.log("attack canceled")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
             
             this.setStep(ExecutionStep.ATTACK)
@@ -415,8 +460,7 @@ export class GameClass {
 
             if (defenderBase.damage >= defenderBase.hp) this.victory(playerID)
             this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
-            this.releaseStack()
-            return
+            return this.releaseStack()
         }
     }
 
@@ -453,6 +497,8 @@ export class GameClass {
                 break;
         }
         console.log("CARD", card)
+        if (out == ReturnTrigger.CANCEL)
+            this.setTriggerReturn(out)
         this.releaseStack()
         if (out == undefined) return ReturnTrigger.CONTINUE
         return out
@@ -513,8 +559,20 @@ export class GameClass {
         this.newHeap()
     }
 
+    /**
+     * Call at end of canoical step.
+     * Recommended to use "return this.releaseStack()" to make sure nothing is ran after this
+     * Otherwise, it could cause issues in the stack with output
+     */
     private releaseStack() {
-        this.data.stack.shift()
+        if (Array.isArray(this.data.stack[0])) { // If current stack is ability list, remove from the list
+            this.data.stack[0].shift()
+            if (this.data.stack[0].length == 0) {
+                this.data.stack.shift()
+            }
+        } else {
+            this.data.stack.shift()
+        }
         this.data.heap.shift()
     }
 
@@ -561,13 +619,11 @@ export class GameClass {
 
             if (this.getTriggerData().amount < 0) {
                 this.setOutput({ cost: 0, out: this.getTriggerReturn() })
-                this.releaseStack() // Must be last
-                return
+                return this.releaseStack() // Must be last
             }
 
             this.setOutput({ cost: this.getTriggerData().amount, out: this.getTriggerReturn() })
-            this.releaseStack() // Must be last
-            return
+            return this.releaseStack() // Must be last
         }
         throw new Error("Shouldn't be able to reach here: Execution Step invalid");
     }
@@ -602,8 +658,8 @@ export class GameClass {
         if (this.getStep()== ExecutionStep.NONE) {
             if (this.data.turn != playerId) {
                 console.log("Cannot play card: Not this player's turn!")
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
 
             console.log("playCard1")
@@ -611,8 +667,8 @@ export class GameClass {
             this.heap().playerId = playerId
             let card = await createCard(cardUid)
             if (card == null) {
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
 
             card.ownerID = playerId;
@@ -621,6 +677,9 @@ export class GameClass {
 
             this.data.cardCount += 1;
             card.cardID = this.data.cardCount;
+
+            console.log("true heap", this.data.heap)
+            console.log("heap",this.heap())
 
             this.heap().card = card
             this.data.playedCard = card;
@@ -637,15 +696,15 @@ export class GameClass {
             let result = this.getChildOutput() as { cost: number, out: ReturnTrigger }
             if (result.out == ReturnTrigger.CANCEL) {
                 this.data.playedCard = undefined
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
             let player = this.players[playerId]!
             if (result.cost > player.resourcesRemaining) {
                 console.log("Cannot play card: Too expensive! Cost:", result.cost, "Resources:", player.resourcesRemaining)
                 this.data.playedCard = undefined
-                this.releaseStack()
-                return
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
             }
 
 
@@ -672,15 +731,13 @@ export class GameClass {
 
             this.setStep(ExecutionStep.POST_PLAY)
             this.setTriggerData({
-                card: this.heap().card,
+                cardID: (this.heap().card as CardActive).cardID,
             })
             this.triggerAbility(Trigger.PLAY)
             return
         }
         if (this.getStep() == ExecutionStep.POST_PLAY) {
-            this.releaseStack() // Must be last step
-            return
-            // await this.endTurn()
+            return this.releaseStack() // Must be last step
         }
     }
 
@@ -746,7 +803,9 @@ export class GameClass {
         if (allPlayersFinished) {
             await this.regroup()
         } else {
-            await this.endTurn()
+            // TODO might need to fix this later
+            this.createStackFunction(StackFunctionType.END_TURN, {})
+            await this.runStack()
         }
     }
 
@@ -806,6 +865,9 @@ export class GameClass {
     }
 
     public async endTurn() {
+        if (this.getChildOutput() == ReturnTrigger.CANCEL) {
+            return this.releaseStack() // Don't end turn if canceled
+        }
         console.log("end turn called")
         this.data.playedCard = undefined;
 
@@ -971,6 +1033,10 @@ export class GameClass {
             max: maxTargets,
         };
         this.data.subPhase = SubPhase.TARGET;
+    }
+
+    public async postBaseDamage() {
+        
     }
 
     public async createTokenUnit(tokenUnit: TokenUnit, playerId: PlayerID) {
