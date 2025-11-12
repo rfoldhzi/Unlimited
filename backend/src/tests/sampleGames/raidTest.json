@@ -1,6 +1,8 @@
 {
     "gameID": 0,
     "cardCount": 7,
+    "stack": [],
+    "heap": [],
     "players": {
         "0": {
             "playerID": "0",

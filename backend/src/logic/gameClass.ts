@@ -1,6 +1,7 @@
-import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase } from "../models/game";
-import { Ability, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, KeyWordAbilites, TokenUnit, Trigger, Upgrade, UpgradeCardIDAbilities } from "./abilities";
+import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType } from "../models/game";
+import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, TokenUnit, Trigger, Upgrade, UpgradeCardIDAbilities } from "./abilities";
 import { createCard } from "./gameHandler";
+
 
 export class GameClass {
     // gameID: number;
@@ -32,12 +33,88 @@ export class GameClass {
     }
 
     /**
+     * Get current stack item
+     * @returns StackItem
+     */
+    private stack(): StackItem {
+        if (Array.isArray(this.data.stack[0])) {
+            return this.data.stack[0][0]!
+        }
+        return this.data.stack[0]!
+    }
+    /**
+     * Get ExecutionStep of current StackItem
+     * @returns ExecutionStep
+     */
+    private getStep(): ExecutionStep {
+        return this.stack().step || ExecutionStep.NONE
+    }
+    /**
+     * Set ExecutionStep of current StackItem
+     * @param step ExecutionStep
+     */
+    private setStep(step: ExecutionStep) {
+        this.stack().step = step
+    }
+    private handleReturn(returnValue: ReturnTrigger): boolean {
+        return returnValue != ReturnTrigger.CONTINUE
+    }
+    private heap(): any {
+        return this.data.heap![0]
+    }
+    private newHeap(): void {
+        this.data.heap.unshift({})
+    }
+    private getInput(): any {
+        if (Array.isArray(this.data.stack[0])) {
+            return this.data.stack[0][0]!.input
+        }
+        return this.data.stack[0]!.input
+    }
+    private getChildOutput(): any {
+        if (Array.isArray(this.data.stack[0])) {
+            return this.data.stack[0][0]!.childOutput
+        }
+        return this.data.stack[0]!.childOutput
+    }
+    private setOutput(output: any): void {
+        if (Array.isArray(this.data.stack[1])) {
+            this.data.stack[1][0]!.childOutput = output
+        }
+        (this.data.stack[1]! as StackItem).childOutput = output
+    }
+    public setTriggerData(data: any) {
+        if (Array.isArray(this.data.stack[0])) {
+            this.data.stack[0][0]!.triggerData = data
+        }
+        (this.data.stack[0]! as StackItem).triggerData = data
+    }
+    public getTriggerData(): any {
+        if (Array.isArray(this.data.stack[0])) {
+            return this.data.stack[0][0]!.triggerData
+        }
+        return this.data.stack[0]!.triggerData
+    }
+    public getParentTriggerData(): any {
+        if (Array.isArray(this.data.stack[1])) {
+            return this.data.stack[1][0]!.triggerData
+        }
+        return this.data.stack[1]!.triggerData
+    }
+    public getTriggerReturn(): ReturnTrigger | undefined {
+        if (this.getTriggerData())
+            return this.getTriggerData().triggerReturn
+        return undefined
+    }
+
+    /**
      * Find in-play unit across all players
      * @param cardID id you are looking for
      * @returns CardActive
      */
     public findUnitAnyPlayer(cardID: CardID): CardActive | undefined {
         let card: CardActive | undefined
+        if (this.data.playedCard?.cardID == cardID) return this.data.playedCard
         for (let playerID in this.players) {
             let player = this.players[playerID]!
             for (let c of player.groundArena) {
@@ -78,7 +155,7 @@ export class GameClass {
 
         let index = list.indexOf(card)
         if (index != -1) {
-            list.splice(index,1)
+            list.splice(index, 1)
         } else {
             console.log("cannot find card in arena")
             // we cant play the card
@@ -100,80 +177,148 @@ export class GameClass {
      * @returns 
      */
     public async attackCard(playerID: PlayerID, attackerID: CardID, defenderID: CardID) {
-        if (this.data.turn != playerID) {
-            console.log("Cannot attack: Not this player's turn!")
-            return
-        }
+        this.createStackFunction(StackFunctionType.END_TURN, {})
+        this.createStackFunction(StackFunctionType.ATTACK_UNIT, {
+            attackerID: attackerID,
+            defenderID: defenderID,
+            playerID: playerID,
+        })
+        await this.runStack()
+    }
+
+    public async stack_attackCard() {
+        let playerID: PlayerID = this.getInput().playerID
+        let attackerID: CardID = this.getInput().attackerID
+        let defenderID: CardID = this.getInput().defenderID
+
         
         let attacker = this.findUnitByPlayer(playerID, attackerID)
         let defender = this.findUnitAnyPlayer(defenderID)
-        console.log("attacker",attacker)
-        console.log("defender",defender)
         if (!attacker) {
+            console.log("attacker", attacker)
+            console.log("defender", defender)
             console.log("Declined Attack: Can't find attacker")
+            this.releaseStack()
             return
         }
         if (!defender) {
             console.log("Declined Attack: Can't find defender")
-            return
-        }
-        if (attacker.controllerID == defender.controllerID) {
-            console.log("Declined Attack: Can't attack card on same team")
-            return
-        }
-        if (!attacker.ready) {
-            console.log("Declined Attack: Attacker must be ready")
+            this.releaseStack()
             return
         }
 
-        let attackData = {
-            attacker: attacker,
-            defender: defender,
-        }
-        let cancel = this.triggerAbility(Trigger.CHECK_UNIT_ATTACK, attackData)
-        if (cancel) {
-            console.log("ability canceled the attack")
+        if (this.getStep() == ExecutionStep.NONE) {
+
+            if (this.data.turn != playerID) {
+                console.log("Cannot attack: Not this player's turn!")
+                this.releaseStack()
+                return
+            }
+
+            if (attacker.controllerID == defender.controllerID) {
+                console.log("Declined Attack: Can't attack card on same team")
+                this.releaseStack()
+                return
+            }
+            if (!attacker.ready) {
+                console.log("Declined Attack: Attacker must be ready")
+                this.releaseStack()
+                return
+            }
+            this.setStep(ExecutionStep.CHECK_ATTACK)
+            this.setTriggerData({
+                attackerID: attackerID,
+                defenderID: defenderID,
+            })
+            this.triggerAbility(Trigger.CHECK_UNIT_ATTACK)
             return
         }
-        this.triggerAbility(Trigger.UNIT_ATTACK, attackData)
-        
 
-        attacker.ready = false
-
-        let attackerData = {
-            dealer: attacker,
-            attacker: attacker,
-            defender: defender,
-            amount: attacker.power
+        if (this.getStep() == ExecutionStep.CHECK_ATTACK) {
+            console.log("CHECK ATTACK")
+            if (this.getTriggerReturn() == ReturnTrigger.CANCEL) {
+                console.log("attack canceled")
+                this.releaseStack()
+                return
+            }
+            
+            this.setStep(ExecutionStep.ATTACK)
+            this.setTriggerData({
+                attackerID: attackerID,
+                defenderID: defenderID,
+            })
+            this.triggerAbility(Trigger.UNIT_ATTACK)
+            return
         }
 
-        cancel = this.triggerAbility(Trigger.DEAL_DAMAGE, attackerData)
-        if (cancel !== true) {
-            defender.damage += attackerData.amount // Here we can expect the data to change with the ability
-            this.triggerAbility(Trigger.DAMAGE_CHANGES, {card: defender})
-            this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+        if (this.getStep() == ExecutionStep.ATTACK) {
+
+            attacker.ready = false
+            console.log("ATTACKER", attacker)
+
+            this.setStep(ExecutionStep.ATTACKER_DEAL_DAMAGE)
+            this.setTriggerData({
+                dealer: attackerID,
+                attackerID: attackerID,
+                defenderID: defenderID,
+                amount: attacker.power
+            })
+            console.log("triggered deal damage, step is",this.getStep()) 
+            this.triggerAbility(Trigger.DEAL_DAMAGE)
+            
+            return
         }
 
+        if (this.getStep() == ExecutionStep.ATTACKER_DEAL_DAMAGE) {
+            this.setStep(ExecutionStep.DEFENDER_COUNTER)
 
-        let defenderData = {
-            dealer: defender,
-            attacker: attacker,
-            defender: defender,
-            amount: defender.power
+            if (this.getTriggerReturn() != ReturnTrigger.CANCEL) {
+                // Deal damage to defender because damage wasn't canceled
+                console.log("TRIGGER")
+                defender.damage += this.getTriggerData().amount // Here we can expect the data to change with the ability
+                this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+                this.setTriggerData({
+                    cardID: defenderID
+                })
+                this.triggerAbility(Trigger.DAMAGE_CHANGES)
+            }
+            return
         }
-        cancel = this.triggerAbility(Trigger.DEAL_DAMAGE, defenderData)
-        if (cancel !== true) {
-            attacker.damage += defenderData.amount // Here we can expect the data to change with the ability
-            this.triggerAbility(Trigger.DAMAGE_CHANGES, {card: attacker})
-            this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+
+        if (this.getStep() == ExecutionStep.DEFENDER_COUNTER) {
+            this.setStep(ExecutionStep.DEFENDER_DEAL_DAMAGE)
+            this.setTriggerData({
+                dealer: attackerID,
+                attackerID: attackerID,
+                defenderID: defenderID,
+                amount: defender.power
+            })
+            this.triggerAbility(Trigger.DEAL_DAMAGE)
+            return
+        }
+        if (this.getStep() == ExecutionStep.DEFENDER_DEAL_DAMAGE) {
+            this.setStep(ExecutionStep.POST_ATTACK)
+
+            if (this.getTriggerReturn() != ReturnTrigger.CANCEL) {
+                // Deal damage to attacker because damage wasn't canceled
+                attacker.damage += this.getTriggerData().amount // Here we can expect the data to change with the ability
+                this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+                this.setTriggerData({
+                    cardID: attackerID
+                })
+                this.triggerAbility(Trigger.DAMAGE_CHANGES)
+            }
+            return
         }
 
-        if (attacker.damage >= attacker.hp) this.defeatCard(attacker)
-        if (defender.damage >= defender.hp) this.defeatCard(defender)
-    
-        this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+        if (this.getStep() == ExecutionStep.POST_ATTACK) {
+            if (attacker.damage >= attacker.hp) await this.defeatCard(attacker)
+            if (defender.damage >= defender.hp) await this.defeatCard(defender)
 
-        await this.endTurn()
+            this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+            this.releaseStack()
+            return
+        }
     }
 
     /**
@@ -185,52 +330,94 @@ export class GameClass {
      * @returns 
      */
     public async attackBase(playerID: PlayerID, attackerID: CardID, defenderPlayerID: PlayerID) {
-        if (this.data.turn != playerID) {
-            console.log("Cannot attack: Not this player's turn!")
-            return
-        }
+        this.createStackFunction(StackFunctionType.END_TURN, {})
+        this.createStackFunction(StackFunctionType.ATTACK_BASE, {
+            attackerID: attackerID,
+            defenderPlayerID: defenderPlayerID,
+            playerID: playerID,
+        })
+        await this.runStack()
+        return
+    }
+
+    public async stack_attackBase() {
+        let playerID: PlayerID = this.getInput().playerID
+        let attackerID: CardID = this.getInput().attackerID
+        let defenderPlayerID: PlayerID = this.getInput().defenderPlayerID
+
         
         let attacker = this.findUnitByPlayer(playerID, attackerID)
         let defenderBase = this.players[defenderPlayerID]?.base
-        console.log("attacker",attacker)
-        console.log("defender",defenderBase)
+
         if (!attacker) {
+            console.log("attacker", attacker)
             console.log("Declined Attack: Can't find attacker")
+            this.releaseStack()
             return
         }
         if (!defenderBase) {
             console.log("Declined Attack: Can't find defenderBase")
-            return
-        }
-        if (attacker.controllerID == defenderPlayerID) {
-            console.log("Declined Attack: Can't attack card on same team")
-            return
-        }
-        if (!attacker.ready) {
-            console.log("Declined Attack: Attacker must be ready")
+            this.releaseStack()
             return
         }
 
-        let attackData = {
-            attacker: attacker,
-            defenderPlayerID: defenderPlayerID,
-        }
-        let cancel = this.triggerAbility(Trigger.CHECK_BASE_ATTACK, attackData)
-        if (cancel) {
-            console.log("ability canceled the attack")
+        if (this.getStep() == ExecutionStep.NONE) {
+
+            if (this.data.turn != playerID) {
+                console.log("Cannot attack: Not this player's turn!")
+                this.releaseStack()
+                return
+            }
+
+            if (attacker.controllerID == defenderPlayerID) {
+                console.log("Declined Attack: Can't attack base on same team")
+                this.releaseStack()
+                return
+            }
+            if (!attacker.ready) {
+                console.log("Declined Attack: Attacker must be ready")
+                this.releaseStack()
+                return
+            }
+            this.setStep(ExecutionStep.CHECK_ATTACK)
+            this.setTriggerData({
+                attackerID: attackerID,
+                defenderPlayerID: defenderPlayerID,
+            })
+            this.triggerAbility(Trigger.CHECK_BASE_ATTACK)
             return
         }
-        this.triggerAbility(Trigger.BASE_ATTACK, attackData)
 
-        attacker.ready = false
-        defenderBase.damage += attacker.power
+        if (this.getStep() == ExecutionStep.CHECK_ATTACK) {
+            console.log("CHECK ATTACK")
+            if (this.getTriggerReturn() == ReturnTrigger.CANCEL) {
+                console.log("attack canceled")
+                this.releaseStack()
+                return
+            }
+            
+            this.setStep(ExecutionStep.ATTACK)
+            this.setTriggerData({
+                attackerID: attackerID,
+                defenderPlayerID: defenderPlayerID,
+            })
+            this.triggerAbility(Trigger.BASE_ATTACK)
+            return
+        }
 
-        if (defenderBase.damage >= defenderBase.hp) this.victory(playerID)
-    
-        
-        this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+        if (this.getStep() == ExecutionStep.ATTACK) {
 
-        await this.endTurn()
+            attacker.ready = false
+            console.log("ATTACKER", attacker)
+
+            attacker.ready = false
+            defenderBase.damage += attacker.power
+
+            if (defenderBase.damage >= defenderBase.hp) this.victory(playerID)
+            this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+            this.releaseStack()
+            return
+        }
     }
 
     public async drawCard(playerId: PlayerID) {
@@ -239,37 +426,150 @@ export class GameClass {
         player.hand.push(cardUid)
     }
 
-    public calculateCardCost(card: CardActive, playerId: PlayerID): number {
-        let cost = card.cost;
+    public cancel() {
+        this.getTriggerData().triggerOutput = ReturnTrigger.CANCEL
+    }
 
-        let aspectPenalty = 0;
-        let cardAspects = card.aspectCost;
-        let ownedAspects = []
-        let player = this.players[playerId]!
-        player.leaders.forEach((leader: Leader) => {
-            leader.aspects.forEach((aspect: Aspect) => ownedAspects.push(aspect))
-        })
-        ownedAspects.push(player.base.aspect)
-
-
-        cardAspects.forEach((aspect: Aspect) => {
-            let index = ownedAspects.indexOf(aspect)
-            if (index == -1) {
-                aspectPenalty += 2
-            } else {
-                ownedAspects.splice(index,1)
-            }
-        });
-
-
-        let costData = {
-            card: card,
-            amount: cost + aspectPenalty,
+    private executeAbility(stack: StackItem): ReturnTrigger {
+        let card = this.findUnitAnyPlayer(stack.input.cardID)
+        if (card == null) {
+            console.log("couldn't find card ability")
+            return ReturnTrigger.CONTINUE
         }
-        this.triggerAbility(Trigger.CALC_COST, costData)
-        
-        if (costData.amount < 0) return 0
-        return costData.amount
+        let ability: Ability
+        let out: ReturnTrigger | void = undefined
+        switch (stack.input.abilityType) {
+            case AbilityType.KEYWORD:
+                ability = KeyWordAbilites[stack.input.abilityKey as Keyword][stack.input.abilityIndex]!
+                out = ability.effect(card, this, this.getParentTriggerData(), stack.input.number)
+                break;
+            case AbilityType.UPGRADE:
+                ability = UpgradeCardIDAbilities[stack.input.abilityKey as CardUID]![stack.input.abilityIndex]!
+                out = ability.effect(card, this, this.getParentTriggerData())
+                break;
+            case AbilityType.CARD:
+                ability = CardIDAbilities[stack.input.abilityKey as CardUID]![stack.input.abilityIndex]!
+                out = ability.effect(card, this, this.getParentTriggerData())
+                break;
+        }
+        console.log("CARD", card)
+        this.releaseStack()
+        if (out == undefined) return ReturnTrigger.CONTINUE
+        return out
+    }
+
+    private async executeStackItem(): Promise<ReturnTrigger> {
+        console.log("Running Stack", this.stack())
+        switch (this.stack().function) {
+            case StackFunctionType.PLAY_CARD:
+                await this.stack_playCard()
+                break;
+            case StackFunctionType.ATTACK_UNIT:
+                await this.stack_attackCard()
+                break;
+            case StackFunctionType.ATTACK_BASE:
+                await this.stack_attackBase()
+                break;
+            case StackFunctionType.CALC_COST:
+                this.stack_calculateCardCost()
+                break;
+            case StackFunctionType.END_TURN:
+                await this.endTurn()
+                break;
+            case StackFunctionType.ABILITY:
+                return this.executeAbility(this.stack())
+        }
+        return ReturnTrigger.CONTINUE
+    }
+
+    private async runStack() {
+        while (this.data.stack.length > 0) {
+            let out = await this.executeStackItem()
+            if (out == ReturnTrigger.STOP) return
+        }
+    }
+
+    private createStackFunction(func: StackFunctionType, input: any) {
+        this.data.stack.unshift({
+            function: func,
+            step: ExecutionStep.NONE,
+            input: input,
+            childOutput: null,
+            triggerData: undefined,
+            triggerReturn: ReturnTrigger.CONTINUE
+        })
+        this.newHeap()
+    }
+
+    private createAbilityStackFunction(func: StackFunctionType, input: any) {
+        (this.data.stack[0] as StackItem[]).unshift({
+            function: func,
+            step: ExecutionStep.NONE,
+            input: input,
+            childOutput: null,
+            triggerData: undefined,
+            triggerReturn: ReturnTrigger.CONTINUE
+        })
+        this.newHeap()
+    }
+
+    private releaseStack() {
+        this.data.stack.shift()
+        this.data.heap.shift()
+    }
+
+
+
+    private stack_calculateCardCost() {
+
+        let card: CardActive = this.getInput().card
+        let playerId: PlayerID = this.getInput().playerId
+
+        if (this.getStep() == ExecutionStep.NONE) {
+            let cost = card.cost;
+
+            let aspectPenalty = 0;
+            let cardAspects = card.aspectCost;
+            let ownedAspects = []
+            let player = this.players[playerId]!
+            player.leaders.forEach((leader: Leader) => {
+                leader.aspects.forEach((aspect: Aspect) => ownedAspects.push(aspect))
+            })
+            ownedAspects.push(player.base.aspect)
+
+
+            cardAspects.forEach((aspect: Aspect) => {
+                let index = ownedAspects.indexOf(aspect)
+                if (index == -1) {
+                    aspectPenalty += 2
+                } else {
+                    ownedAspects.splice(index, 1)
+                }
+            });
+
+
+            this.setStep(ExecutionStep.CALC_COST)
+            this.setTriggerData({
+                cardID: card.cardID,
+                amount: cost + aspectPenalty,
+            })
+            this.triggerAbility(Trigger.CALC_COST)
+            return
+        }
+
+        if (this.getStep() == ExecutionStep.CALC_COST) {
+
+            if (this.getTriggerData().amount < 0) {
+                this.setOutput({ cost: 0, out: this.getTriggerReturn() })
+                this.releaseStack() // Must be last
+                return
+            }
+
+            this.setOutput({ cost: this.getTriggerData().amount, out: this.getTriggerReturn() })
+            this.releaseStack() // Must be last
+            return
+        }
+        throw new Error("Shouldn't be able to reach here: Execution Step invalid");
     }
 
     /**
@@ -280,67 +580,112 @@ export class GameClass {
      * @returns 
      */
     public async playCard(cardUid: CardUID, playerId: PlayerID) {
-        if (this.data.turn != playerId) {
-            console.log("Cannot play card: Not this player's turn!")
+        this.createStackFunction(StackFunctionType.END_TURN, {})
+        this.createStackFunction(StackFunctionType.PLAY_CARD, {
+            cardUid: cardUid,
+            playerId: playerId,
+        })
+        await this.runStack()
+    }
+
+    /**
+     * Input:
+     * 
+     * cardUid: CardUID
+     * playerId: PlayerID
+     */
+    private async stack_playCard() {
+        let cardUid: CardUID = this.getInput().cardUid
+        let playerId: PlayerID = this.getInput().playerId
+
+        // Generate card 
+        if (this.getStep()== ExecutionStep.NONE) {
+            if (this.data.turn != playerId) {
+                console.log("Cannot play card: Not this player's turn!")
+                this.releaseStack()
+                return
+            }
+
+            console.log("playCard1")
+
+            this.heap().playerId = playerId
+            let card = await createCard(cardUid)
+            if (card == null) {
+                this.releaseStack()
+                return
+            }
+
+            card.ownerID = playerId;
+            card.controllerID = playerId;
+            card.ready = false;
+
+            this.data.cardCount += 1;
+            card.cardID = this.data.cardCount;
+
+            this.heap().card = card
+            this.data.playedCard = card;
+
+            this.setStep(ExecutionStep.CALC_COST)
+            this.createStackFunction(StackFunctionType.CALC_COST, {
+                card: this.heap().card,
+                playerId: this.heap().playerId,
+            })
             return
         }
 
-        console.log("playCard1")
-        let player = this.players[playerId]!
-        let card = await createCard(cardUid)
-        if (card == null) {
-            return
-        }
-        
-        card.ownerID = playerId;
-        card.controllerID = playerId;
+        if (this.getStep() == ExecutionStep.CALC_COST) {
+            let result = this.getChildOutput() as { cost: number, out: ReturnTrigger }
+            if (result.out == ReturnTrigger.CANCEL) {
+                this.data.playedCard = undefined
+                this.releaseStack()
+                return
+            }
+            let player = this.players[playerId]!
+            if (result.cost > player.resourcesRemaining) {
+                console.log("Cannot play card: Too expensive! Cost:", result.cost, "Resources:", player.resourcesRemaining)
+                this.data.playedCard = undefined
+                this.releaseStack()
+                return
+            }
 
-        this.data.cardCount += 1;
-        card.cardID = this.data.cardCount;
-        this.data.playedCard = card;
 
-        let cost = this.calculateCardCost(card, playerId)
-        if (cost > player.resourcesRemaining) {
-            console.log("Cannot play card: Too expensive! Cost:", cost, "Resources:", player.resourcesRemaining)
+            // find card in player's hand
+            console.log("PLYER", player, player.hand, cardUid)
+            let index = player.hand.indexOf(cardUid)
+            if (index != -1) {
+                player.hand.splice(index, 1)
+            } else {
+                console.log("cannot find card in hand")
+                throw new Error("Why can't we find card in hand?");
+            }
+
+            player.resourcesRemaining -= result.cost
+
+            // player.groundArena.push(card)
+            if (this.heap().card.arena == Arena.GROUND) {
+                player.groundArena.push(this.heap().card)
+            } else if (this.heap().card.arena == Arena.SPACE) {
+                player.spaceArena.push(this.heap().card)
+            }
+
             this.data.playedCard = undefined
+
+            this.setStep(ExecutionStep.POST_PLAY)
+            this.setTriggerData({
+                card: this.heap().card,
+            })
+            this.triggerAbility(Trigger.PLAY)
             return
         }
-
-        player.resourcesRemaining -= cost
-
-        console.log("playCard2")
-        card.ready = false; 
-
-        // find card in player's hand
-        console.log("PLYER", player, player.hand, cardUid)
-        let index = player.hand.indexOf(cardUid)
-        if (index != -1) {
-            player.hand.splice(index,1)
-        } else {
-            console.log("cannot find card in hand")
-            // we cant play the card
-            this.data.playedCard = undefined
+        if (this.getStep() == ExecutionStep.POST_PLAY) {
+            this.releaseStack() // Must be last step
             return
+            // await this.endTurn()
         }
-        
-        // player.groundArena.push(card)
-        if (card.arena == Arena.GROUND) {
-            player.groundArena.push(card)
-        } else if (card.arena == Arena.SPACE) {
-            player.spaceArena.push(card)
-        }
-        this.data.playedCard = undefined
-
-        let costData = {
-            card: card,
-        }
-        this.triggerAbility(Trigger.CALC_COST, costData)
-
-        await this.endTurn()
     }
 
     public async regroup() {
-        
+
         this.upgradeRemoval(EffectDuraction.END_OF_PHASE);
 
         this.data.phase = Phase.REGROUP
@@ -362,7 +707,7 @@ export class GameClass {
             player.cardsToResource = 1;
             console.log("cardsToResource2", player.cardsToResource)
         }
-    }   
+    }
 
 
     public async checkStartActionPhase() {
@@ -433,7 +778,7 @@ export class GameClass {
         }
         let index = player.hand.indexOf(cardUid)
         if (index != -1) {
-            player.hand.splice(index,1)
+            player.hand.splice(index, 1)
         } else {
             console.log("cannot find card in hand")
             // we cant play the card
@@ -474,6 +819,7 @@ export class GameClass {
         if (allPlayersFinished) {
             console.log("regrouping...")
             await this.regroup()
+            this.releaseStack()
             return
         }
 
@@ -481,15 +827,16 @@ export class GameClass {
         let i = turnOrder.indexOf(this.data.turn)
         if (i == -1) {
             console.log("cannot end turn: Current turn invalid", this.data.turn)
-            return 
+            return
         }
         console.log("turn Order1", turnOrder, i, turnOrder[i])
         let counter = 0
         while (counter < turnOrder.length) {
-            i = (i+1) % turnOrder.length
+            i = (i + 1) % turnOrder.length
             if (!this.players[turnOrder[i] as any]!.finished) {
                 this.data.turn = turnOrder[i] as PlayerID
                 console.log("turn Order2", turnOrder, i, turnOrder[i])
+                this.releaseStack()
                 return;
             }
             counter += 1
@@ -502,6 +849,7 @@ export class GameClass {
         card.upgrades.push(upgrade);
         card.power += upgrade.power;
         card.hp += upgrade.hp;
+        
     }
 
     public getEveryUnit(): CardActive[] {
@@ -518,51 +866,86 @@ export class GameClass {
         return unitList
     }
 
-    public triggerAbility(trigger: Trigger, data?: any) {
+    public triggerAbility(trigger: Trigger): ReturnTrigger {
         let cards = this.getEveryUnit();
         if (this.data.playedCard) {
             cards.push(this.data.playedCard)
         }
+        this.data.stack.unshift([]) // New Stack Item list of all triggered abilities
         for (let card of cards) {
             // Trigger keyword abilities
             for (let keyword of card.keywords) {
-                for (let ability of KeyWordAbilites[keyword.keyword]) {
+                for (let index in KeyWordAbilites[keyword.keyword]) {
+                    let ability = KeyWordAbilites[keyword.keyword][index]!
                     if (ability.trigger == trigger) {
-                        let output = ability.effect(card, this, data, keyword.number)
-                        if (output !== undefined) return output
+                        this.createAbilityStackFunction(StackFunctionType.ABILITY, {
+                            cardID: card.cardID,
+                            abilityType: AbilityType.KEYWORD,
+                            abilityKey: keyword.keyword,
+                            abilityIndex: index,
+                            number: keyword.number
+                        })
+                        // let output = ability.effect(card, this, data, keyword.number)
+                        // if (output !== undefined) return output
                     }
                 }
             }
             for (let upgrade of card.upgrades) {
                 //Trigger card specific upgrade abilities
                 if (UpgradeCardIDAbilities[upgrade.abilityID || ""]) { // Find ability based on id of card that created the upgrade
-                    for (let ability of UpgradeCardIDAbilities[upgrade.abilityID!]!) {
+                    for (let index in UpgradeCardIDAbilities[upgrade.abilityID!]!) {
+                        let ability = UpgradeCardIDAbilities[upgrade.abilityID!]![index]!
                         if (ability.trigger == trigger) {
-                            let output = ability.effect(card, this, data)
-                            if (output !== undefined) return output
+                            this.createAbilityStackFunction(StackFunctionType.ABILITY, {
+                                cardID: card.cardID,
+                                abilityType: AbilityType.UPGRADE,
+                                abilityKey: upgrade.abilityID,
+                                abilityIndex: index,
+                            })
+                            // let output = ability.effect(card, this, data)
+                            // if (output !== undefined) return output
                         }
                     }
                 }
                 // Trigger abilities of keywords on upgrades
                 if (upgrade.keyword) {
-                    for (let ability of KeyWordAbilites[upgrade.keyword.keyword]) {
+                    for (let index in KeyWordAbilites[upgrade.keyword.keyword]) {
+                        let ability = KeyWordAbilites[upgrade.keyword.keyword][index]!
                         if (ability.trigger == trigger) {
-                            let output = ability.effect(card, this, data, upgrade.keyword.number)
-                            if (output !== undefined) return output
+                            this.createAbilityStackFunction(StackFunctionType.ABILITY, {
+                                cardID: card.cardID,
+                                abilityType: AbilityType.KEYWORD,
+                                abilityKey: upgrade.keyword.keyword,
+                                abilityIndex: index,
+                                number: upgrade.keyword.number
+                            })
+                            // let output = ability.effect(card, this, data, upgrade.keyword.number)
+                            // if (output !== undefined) return output
                         }
                     }
                 }
             }
             // Trigger card specific abilities
             if (CardIDAbilities[card.cardUid]) {
-                for (let ability of CardIDAbilities[card.cardUid]!) {
+                for (let index in CardIDAbilities[card.cardUid]!) {
+                    let ability = CardIDAbilities[card.cardUid]![index]!
                     if (ability.trigger == trigger) {
-                        let output = ability.effect(card, this, data)
-                        if (output !== undefined) return output
+                        this.createAbilityStackFunction(StackFunctionType.ABILITY, {
+                            cardID: card.cardID,
+                            abilityType: AbilityType.CARD,
+                            abilityKey: card.cardUid,
+                            abilityIndex: index,
+                        })
+                        // let output = ability.effect(card, this, data)
+                        // if (output !== undefined) return output
                     }
                 }
             }
         }
+        if ((this.data.stack[0] as StackItem[]).length == 0) {
+            this.data.stack.shift() // Remove Stack Item list if no abilities triggered
+        }
+        return ReturnTrigger.CONTINUE
     }
 
     public upgradeRemoval(duration: EffectDuraction) {
@@ -591,13 +974,13 @@ export class GameClass {
     }
 
     public async createTokenUnit(tokenUnit: TokenUnit, playerId: PlayerID) {
-        
+
         let player = this.players[playerId]!
         let card = await createCard(tokenUnit)
         if (card == null) {
             return
         }
-        
+
         card.ownerID = playerId;
         card.controllerID = playerId;
 
@@ -609,6 +992,6 @@ export class GameClass {
         } else if (card.arena == Arena.SPACE) {
             player.spaceArena.push(card)
         }
-        
+
     }
 }

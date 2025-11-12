@@ -1,4 +1,4 @@
-import { CardKeyword, Upgrade } from "../logic/abilities";
+import { CardKeyword, ExecutionStep, ReturnTrigger, Upgrade } from "../logic/abilities";
 
 export enum Aspect {
     VIGILANCE = "Vigilance",
@@ -90,6 +90,24 @@ export interface PlayerState {
     cardsToResource: number,
 }
 
+export interface StackItem {
+    function: StackFunctionType,
+    step: ExecutionStep,
+    input: any,
+    childOutput: any,
+    triggerData: any,
+    triggerReturn: ReturnTrigger
+}
+
+export enum StackFunctionType {
+    CALC_COST = "CALC_COST",
+    PLAY_CARD = "PLAY_CARD",
+    END_TURN = "END_TURN",
+    ATTACK_UNIT = "ATTACK_UNIT",
+    ATTACK_BASE = "ATTACK_BASE",
+    ABILITY = "ABILITY",
+}
+
 export interface Game {
     gameID: number;
     players: {[playerID: string] : PlayerState;}
@@ -107,6 +125,8 @@ export interface Game {
     cardCount: number,
     winner?: PlayerID,
     playedCard?: CardActive | undefined;
+    heap: any[];
+    stack: (StackItem | StackItem[])[];
 }
 
 export let games: Game[] = [];

@@ -103,6 +103,7 @@ export async function importDeck(code: string, player: PlayerState, randomize?: 
 }
 
 export async function fetchCard(cardUid: CardUID) {
+    console.log("anything")
     let result = await new Promise((resolve, reject) => {
         https.get(`https://admin.starwarsunlimited.com/api/card/${cardUid}`, (res: any) => {
             let output = '';
@@ -236,6 +237,8 @@ export const createSampleGame = async (): Promise<Game> => {
         subPhase: SubPhase.TURN,
         targets: [],
         playedCard: undefined,
+        heap: [],
+        stack: []
     }
     return game
 }

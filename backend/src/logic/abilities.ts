@@ -1,35 +1,53 @@
-import { Arena, Base, CardActive, CardUID, Game, PlayerID, PlayerState } from "../models/game";
+import { Arena, Base, CardActive, CardID, CardUID, Game, PlayerID, PlayerState } from "../models/game";
 import { GameClass } from "./gameClass";
+
+export enum ReturnTrigger {
+    CONTINUE = "",
+    STOP = "Stop",
+    CANCEL = "Cancel",
+}
+
+export enum ExecutionStep {
+    NONE = "NONE",
+    CALC_COST = "CALC_COST",
+    POST_PLAY = "POST_PLAY",
+    CHECK_ATTACK = "CHECK_ATTACK",
+    ATTACK = "ATTACK",
+    ATTACKER_DEAL_DAMAGE = "ATTACKER_DEAL_DAMAGE",
+    DEFENDER_COUNTER = "DEFENDER_COUNTER",
+    DEFENDER_DEAL_DAMAGE = "DEFENDER_DEAL_DAMAGE",
+    POST_ATTACK = "POST_ATTACK",
+}
 
 export enum Trigger {
     /** After card is on the ground/space
      * 
-     * Data: card
+     * Data: cardID
      */
     PLAY,
     DEFEAT,
 
     /** Before maybe attack takes place
      * 
-     *  Data: attacker, defender
+     *  Data: attackerID, defenderID
     */
     CHECK_UNIT_ATTACK,
 
     /** Before confirmed attack takes place
      * 
-     *  Data: attacker, defender
+     *  Data: attackerID, defenderID
     */
     UNIT_ATTACK,
 
     /** Before maybe base attack takes place
      * 
-     *  Data: attacker, defender
+     *  Data: attackerID, defenderPlayerID
     */
     CHECK_BASE_ATTACK,
 
     /** Before attack takes place
      * 
-     *  Data: attacker, defenderPlayerID
+     *  Data: attackerID, defenderPlayerID
     */
     BASE_ATTACK,
 
@@ -47,13 +65,13 @@ export enum Trigger {
 
     /** After a damage update happens
      * 
-     *  Data: card
+     *  Data: cardID
     */
     DAMAGE_CHANGES,
 
     /** Calculating final cost of card
      * 
-     *  Data: card, amount
+     *  Data: cardID, amount
      * 
      *  Update amount if data changes
     */
@@ -84,9 +102,15 @@ export interface CardKeyword {
     number: number,
 }
 
+export enum AbilityType { // Type so stack knows which dictionary ability is in
+    KEYWORD,
+    UPGRADE,
+    CARD,
+}
+
 export interface Ability {
     trigger: Trigger,
-    effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => boolean | void,
+    effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => ReturnTrigger | void,
 }
 
 export interface Upgrade {
@@ -107,8 +131,8 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
         {
             trigger: Trigger.UNIT_ATTACK,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let attacker: CardActive = data.attacker;
-                if (attacker != thisCard) return;
+                let attackerID: CardID = data.attackerID;
+                if (attackerID != thisCard.cardID) return;
 
                 let upgrade: Upgrade = {
                     power: number || 1,
@@ -121,8 +145,8 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
         {
             trigger: Trigger.BASE_ATTACK,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let attacker: CardActive = data.attacker;
-                if (attacker != thisCard) return;
+                let attackerID: CardID = data.attackerID;
+                if (attackerID != thisCard.cardID) return;
 
                 let upgrade: Upgrade = {
                     power: number || 1,
@@ -158,37 +182,40 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
         {
             trigger: Trigger.CHECK_UNIT_ATTACK,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let attacker: CardActive = data.attacker;
-                let defender: CardActive = data.defender;
+                let attackerID: CardID = data.attackerID;
+                let defenderID: CardID = data.defenderID;
+                let attacker: CardActive = game.findUnitAnyPlayer(attackerID)!;
+                let defender: CardActive = game.findUnitAnyPlayer(defenderID)!;
                 // Ignore if the defender and sentinal are different teams
                 if (defender.controllerID != thisCard.controllerID) {
-                    return false
+                    return ReturnTrigger.CONTINUE
                 }
                 // Ignore if the defender has sentinal
                 if (defender.keywords.find(
                     (keyword: CardKeyword) => keyword.keyword == Keyword.SENTINAL
                 )) {
-                    return false
+                    return ReturnTrigger.CONTINUE
                 }
                 // Cancel attack if the sentinal in the same arena as attacker
                 if (thisCard.arena == attacker.arena) {
-                    return true
+                    return ReturnTrigger.CANCEL
                 }
             }
         },
         {
             trigger: Trigger.CHECK_BASE_ATTACK,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let attacker: CardActive = data.attacker;
+                let attackerID: CardID = data.attackerID;
+                let attacker: CardActive = game.findUnitAnyPlayer(attackerID)!;
                 let defenderPlayerID: PlayerID = data.defenderPlayerID
                 
                 // Ignore if the defender and sentinal are different teams
                 if (defenderPlayerID != thisCard.controllerID) {
-                    return false
+                    return ReturnTrigger.CONTINUE
                 }
                 // Cancel attack if the sentinal in the same arena as attacker
                 if (thisCard.arena == attacker.arena) {
-                    return true
+                    return ReturnTrigger.CANCEL
                 }
             }
         },
@@ -218,8 +245,8 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
         {
             trigger: Trigger.PLAY,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let card: CardActive = data.card;
-                if (card == thisCard) {
+                let cardID: CardID = data.cardID;
+                if (cardID == thisCard.cardID) {
                     let upgrade: Upgrade = {
                         power: 0,
                         hp: 0,
@@ -238,9 +265,9 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
         {
             trigger: Trigger.CHECK_UNIT_ATTACK,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let defender: CardActive = data.defender;
-                if (defender == thisCard) {
-                    return true // Cancel attack if attacking this unit
+                let defenderID: CardID = data.defenderID;
+                if (defenderID == thisCard.cardID) {
+                    return ReturnTrigger.CANCEL // Cancel attack if attacking this unit
                 }
             }
         },
@@ -276,7 +303,7 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
             // Reduce cost by 1 for every damaged ground unit
             trigger: Trigger.CALC_COST,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                if (data.card == thisCard) {
+                if (data.cardID == thisCard.cardID) {
                     let cards = game.getEveryUnit()
                     for (let card of cards) {
                         if (card.damage > 0 && card.arena == Arena.GROUND)
