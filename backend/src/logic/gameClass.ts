@@ -247,6 +247,71 @@ export class GameClass {
         this.data.winner = playerID;
     }
 
+    public dealDamage(dealerID: CardID, attackerID: CardID, defenderID: CardID, amount: number) {
+        this.createStackFunction(StackFunctionType.DEAL_DAMAGE, {
+            attackerID: attackerID,
+            defenderID: defenderID,
+            dealerID: dealerID,
+            amount: amount
+        })
+    }
+
+    private stack_dealDamage() {
+        let attackerID: CardID = this.getInput().attackerID
+        let defenderID: CardID = this.getInput().defenderID
+        let dealerID: CardID = this.getInput().dealerID
+        let amount: number = this.getInput().amount
+
+        if (this.getStep() == ExecutionStep.NONE) {
+            this.setStep(ExecutionStep.ATTACKER_DEAL_DAMAGE)
+            this.setTriggerData({
+                dealerID: dealerID,
+                attackerID: attackerID,
+                defenderID: defenderID,
+                amount: amount
+            })
+            this.triggerAbility(Trigger.DEAL_DAMAGE)
+        }
+        if (this.getStep() == ExecutionStep.ATTACKER_DEAL_DAMAGE) {
+            this.setStep(ExecutionStep.DEFEAT)
+            if (this.getTriggerReturn() != ReturnTrigger.CANCEL) {
+                let victim: CardActive | undefined
+                if (attackerID != dealerID)
+                    victim = this.findUnitAnyPlayer(attackerID)
+                if (defenderID != dealerID)
+                    victim = this.findUnitAnyPlayer(defenderID)
+
+                // Deal damage to non-dealer because damage wasn't canceled
+                if (victim) {
+                    victim.damage += this.getTriggerData().amount // Here we can expect the data to change with the ability
+                    this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+                    this.setTriggerData({
+                        cardID: attackerID
+                    })
+                    this.triggerAbility(Trigger.DAMAGE_CHANGES)
+                }
+
+            }
+            return
+        }
+        if (this.getStep() == ExecutionStep.DEFEAT) {
+            this.endStack()
+
+            let victim: CardActive | undefined
+            if (attackerID != dealerID)
+                victim = this.findUnitAnyPlayer(attackerID)
+            if (defenderID != dealerID)
+                victim = this.findUnitAnyPlayer(defenderID)
+
+            if (victim && victim.damage >= victim.hp)
+                this.createStackFunction(StackFunctionType.DEFEAT, {
+                    cardID: victim.cardID
+                })
+
+            return
+        }
+    }
+
     /**
      * ACTION
      * 
@@ -270,6 +335,11 @@ export class GameClass {
         let attackerID: CardID = this.getInput().attackerID
         let defenderID: CardID = this.getInput().defenderID
 
+        if (this.getStep() == ExecutionStep.POST_ATTACK) {
+            //Post Attack is first because attacker and defender might be dead
+            this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+            return this.releaseStack()
+        }
         
         let attacker = this.findUnitByPlayer(playerID, attackerID)
         let defender = this.findUnitAnyPlayer(defenderID)
@@ -285,6 +355,8 @@ export class GameClass {
             this.setOutput(ReturnTrigger.CANCEL)
             return this.releaseStack()
         }
+        attacker = attacker!
+        defender = defender!
 
         if (this.getStep() == ExecutionStep.NONE) {
 
@@ -337,7 +409,7 @@ export class GameClass {
 
             this.setStep(ExecutionStep.ATTACKER_DEAL_DAMAGE)
             this.setTriggerData({
-                dealer: attackerID,
+                dealerID: attackerID,
                 attackerID: attackerID,
                 defenderID: defenderID,
                 amount: attacker.power
@@ -366,7 +438,7 @@ export class GameClass {
         if (this.getStep() == ExecutionStep.DEFENDER_COUNTER) {
             this.setStep(ExecutionStep.DEFENDER_DEAL_DAMAGE)
             this.setTriggerData({
-                dealer: attackerID,
+                dealerID: defenderID,
                 attackerID: attackerID,
                 defenderID: defenderID,
                 amount: defender.power
@@ -375,7 +447,7 @@ export class GameClass {
             return
         }
         if (this.getStep() == ExecutionStep.DEFENDER_DEAL_DAMAGE) {
-            this.setStep(ExecutionStep.POST_ATTACK)
+            this.setStep(ExecutionStep.DEFEAT)
 
             if (this.getTriggerReturn() != ReturnTrigger.CANCEL) {
                 // Deal damage to attacker because damage wasn't canceled
@@ -389,9 +461,16 @@ export class GameClass {
             return
         }
 
-        if (this.getStep() == ExecutionStep.POST_ATTACK) {
-            this.stack().ended = true // Instead of simply releasing stack, mark this as ended in case there are deaths and they created child events. 
-            
+        if (this.getStep() == ExecutionStep.DEFEAT) {
+            // this.stack().ended = true // Instead of simply releasing stack, mark this as ended in case there are deaths and they created child events. 
+            this.setStep(ExecutionStep.POST_ATTACK)
+
+            this.setTriggerData({
+                attackerID: attackerID,
+                defenderID: defenderID,
+            })
+            this.triggerAbility(Trigger.POST_UNIT_ATTACK)
+
             if (attacker.damage >= attacker.hp) 
                 this.createStackFunction(StackFunctionType.DEFEAT, {
                     cardID: attacker.cardID
@@ -401,10 +480,12 @@ export class GameClass {
                     cardID: defender.cardID
                 })
 
-            this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
             return 
             // return this.releaseStack()
         }
+
+
+
     }
 
     /**
@@ -518,7 +599,7 @@ export class GameClass {
     private executeAbility(stack: StackItem): ReturnTrigger {
         let card = this.findUnitAnyPlayer(stack.input.cardID)
         if (card == null) {
-            console.log("couldn't find card ability")
+            this.releaseStack()
             return ReturnTrigger.CONTINUE
         }
         let ability: Ability
@@ -572,6 +653,9 @@ export class GameClass {
                 break;
             case StackFunctionType.ABILITY:
                 return this.executeAbility(this.stack())
+            case StackFunctionType.DEAL_DAMAGE:
+                this.stack_dealDamage()
+                break;
             case StackFunctionType.DEFEAT:
                 this.stack_defeatCard()
                 break
@@ -610,6 +694,14 @@ export class GameClass {
             ended: false
         })
         this.newHeap()
+    }
+
+    /**
+     * This one you call, but don't add to stack before calling.
+     * Next time the stack reaches this item, it will release it
+     */
+    public endStack() {
+        this.stack().ended = true
     }
 
     /**

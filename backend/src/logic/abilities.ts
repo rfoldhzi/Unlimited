@@ -60,7 +60,7 @@ export enum Trigger {
     UNIT_ATTACK,
 
     /**
-     * After attack has dealt damage, but before units are defeated
+     * After attack has dealt damage, after units are defeated
      * 
      * Data: attackerID, defenderID
      */
@@ -80,7 +80,7 @@ export enum Trigger {
 
     /** Right before deal damage
      * 
-     *  Data: dealer, attacker, defender, amount
+     *  Data: dealerID, attackerID, defenderID, amount
      * 
      *  Update amount if data changes
      * 
@@ -189,17 +189,19 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
             }
         }
     ],
+
     [Keyword.OVERWHELM]: [
         {
             trigger: Trigger.DEAL_DAMAGE,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let dealer: CardActive = data.dealer;
-                let attacker: CardActive = data.dealer;
-                if (dealer != thisCard) return;
-                if (attacker != thisCard) return;
+                let dealerID: CardID = data.dealerID;
+                let attackerID: CardID = data.attackerID;
+                if (dealerID != thisCard.cardID) return;
+                if (attackerID != thisCard.cardID) return;
 
                 let damage: number = data.damage;
-                let defender: CardActive = data.defender;
+                let defender: CardActive | undefined = game.findUnitAnyPlayer(data.defenderID);
+                if (!defender) return
                 let baseDamage = 0;
                 if (damage > (defender.hp - defender.damage)) {
                     baseDamage = damage - (defender.hp - defender.damage)
@@ -424,11 +426,55 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
 
             }
         }
-    ]
+    ],
+    ["4328408486"]: [ // Incinerator Trooper
+        { 
+            // Ability is to deal damage before the defender
+            // Solution is to block damage dealtt during attack, and 
+            // give defender upgrade to deal damage post_attack
+            trigger: Trigger.DEAL_DAMAGE,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.attackerID != thisCard.cardID) return
+                if (data.defenderID != data.dealerID) return
+                // Don't block damage if marked by self (marked means he already blocked the damage earlier)
+                if (thisCard.upgrades.find((u: Upgrade) => u.abilityID == "4328408486_2")) return 
+                let defender: CardActive = game.findUnitAnyPlayer(data.defenderID)!;
+                let upgrade: Upgrade = {
+                    power: 0,
+                    hp: 0,
+                    duration: EffectDuraction.END_OF_ATTACK,
+                    abilityID: "4328408486",
+                }
+                game.applyUpgrade(defender, upgrade)
+                let upgrade2: Upgrade = {
+                    power: 0,
+                    hp: 0,
+                    duration: EffectDuraction.END_OF_ATTACK,
+                    abilityID: "4328408486_2",
+                }
+                game.applyUpgrade(thisCard, upgrade2)
+                return ReturnTrigger.CANCEL
+            }
+        }]
 }
 
 
 
 export const UpgradeCardIDAbilities: {[key in CardUID]: Ability[]} = {
+    ["4328408486"]: [ // Incinerator Trooper mechanics
+        {
+            // This upgrade allows for damage after the attack from the defender
+            trigger: Trigger.POST_UNIT_ATTACK, // expires after this
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.defenderID != thisCard.cardID) return
+                let attacker = game.findUnitAnyPlayer(data.attackerID)
+                if (!attacker) return
+                if (attacker.cardUid != "4328408486") return
 
+                game.dealDamage(thisCard.cardID, data.attackerID, data.defenderID, thisCard.power)
+                return ReturnTrigger.ENDED
+            }
+        }
+    ],
+    ["4328408486_2"]: [], // Incinerator Trooper marker to no longer block defender damage
 }

@@ -108,6 +108,7 @@ export enum StackFunctionType {
     ATTACK_BASE = "ATTACK_BASE",
     ABILITY = "ABILITY",
     DEFEAT = "DEFEAT",
+    DEAL_DAMAGE = "DEAL_DAMAGE",
 }
 
 export interface Game {
