@@ -97,6 +97,7 @@ export interface StackItem {
     childOutput: any,
     triggerData: any,
     triggerReturn: ReturnTrigger
+    ended: boolean,
 }
 
 export enum StackFunctionType {
@@ -106,6 +107,7 @@ export enum StackFunctionType {
     ATTACK_UNIT = "ATTACK_UNIT",
     ATTACK_BASE = "ATTACK_BASE",
     ABILITY = "ABILITY",
+    DEFEAT = "DEFEAT",
 }
 
 export interface Game {

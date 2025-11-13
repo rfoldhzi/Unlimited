@@ -1,0 +1,153 @@
+{
+    "gameID": 0,
+    "cardCount": 4,
+    "players": {
+        "0": {
+            "playerID": "0",
+            "base": {
+                "cardUid": "2376813177",
+                "aspect": "Cunning",
+                "hp": 30,
+                "damage": 10
+            },
+            "leaders": [
+                {
+                    "cardUid": "8304104587",
+                    "aspects": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "0726963200",
+                "6523135540",
+                "6930799884",
+                "2404240951",
+                "8613908567",
+                "1162729042"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 3,
+                    "cardUid": "7249575408"
+                }
+            ],
+            "deck": [
+                "7983965297",
+                "7742118411",
+                "6930799884"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 1,
+                    "cardUid": "9394156877",
+                    "name": "Dhani Pilgrim",
+                    "hp": 3,
+                    "power": 1,
+                    "cost": 1,
+                    "aspectCost": [
+                        "Vigilance"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010055_EN_Dhani_Pilgrim_69154b8875.png",
+                    "controllerID": "0",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 3,
+            "resourcesRemaining": 3,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
+                "cardUid": "0507674993",
+                "aspect": "Command",
+                "hp": 30,
+                "damage": 10
+            },
+            "leaders": [
+                {
+                    "cardUid": "6088773439",
+                    "aspects": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "3347454174",
+                "4100796757",
+                "7227136692",
+                "9127322562",
+                "4328408486",
+                "8746311599"
+            ],
+            "resources": [
+                {
+                    "ownerID": "1",
+                    "cardID": 4,
+                    "cardUid": "7227136692"
+                }
+            ],
+            "deck": [
+                "9655836052",
+                "6867378216",
+                "8986035098",
+                "9655836052"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 2,
+                    "cardUid": "2529211493",
+                    "name": "Imperial Dark Trooper",
+                    "hp": 3,
+                    "power": 3,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Command",
+                        "Villainy"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010080_EN_Imperial_Dark_Trooper_de4f5d0781.png",
+                    "controllerID": "1",
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 3,
+            "resourcesRemaining": 3,
+            "finished": false,
+            "cardsToResource": 0
+        }
+    },
+    "name": "Cloud",
+    "initiative": "1",
+    "turn": "1",
+    "phase": 0,
+    "initiativeClaimed": false,
+    "subPhase": 0,
+    "targets": [],
+    "heap": [],
+    "stack": []
+}

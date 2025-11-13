@@ -191,7 +191,7 @@ export class GameClass {
         return card
     }
 
-    public async defeatCard(card: CardActive) {
+    public defeatCard(card: CardActive) {
         let player = this.players[card.controllerID]!
         let list: CardActive[]
         if (card.arena == Arena.GROUND) {
@@ -207,6 +207,38 @@ export class GameClass {
             console.log("cannot find card in arena")
             // we cant play the card
             return
+        }
+    }
+
+    private async stack_defeatCard() {
+        let cardID: CardID = this.getInput().cardID
+
+        if (this.getStep() == ExecutionStep.NONE) {
+            this.setStep(ExecutionStep.CHECK_DEFEAT)
+            this.setTriggerData({
+                cardID: cardID,
+            })
+            this.triggerAbility(Trigger.CHECK_DEFEAT)
+            return
+        }
+        if (this.getStep() == ExecutionStep.CHECK_DEFEAT) {
+            if (this.getTriggerReturn() == ReturnTrigger.CANCEL) {
+                console.log("defeat canceled")
+                this.setOutput(ReturnTrigger.CANCEL)
+                return this.releaseStack()
+            }
+            this.setStep(ExecutionStep.DEFEAT)
+            this.setTriggerData({
+                cardID: cardID,
+            })
+            this.triggerAbility(Trigger.DEFEAT)
+            return
+        }
+        if (this.getStep() == ExecutionStep.DEFEAT) {
+            let card = this.findUnitAnyPlayer(cardID)
+            if (card)
+                this.defeatCard(card)
+            return this.releaseStack()
         }
     }
 
@@ -358,11 +390,20 @@ export class GameClass {
         }
 
         if (this.getStep() == ExecutionStep.POST_ATTACK) {
-            if (attacker.damage >= attacker.hp) await this.defeatCard(attacker)
-            if (defender.damage >= defender.hp) await this.defeatCard(defender)
+            this.stack().ended = true // Instead of simply releasing stack, mark this as ended in case there are deaths and they created child events. 
+            
+            if (attacker.damage >= attacker.hp) 
+                this.createStackFunction(StackFunctionType.DEFEAT, {
+                    cardID: attacker.cardID
+                })
+            if (defender.damage >= defender.hp)
+                this.createStackFunction(StackFunctionType.DEFEAT, {
+                    cardID: defender.cardID
+                })
 
             this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
-            return this.releaseStack()
+            return 
+            // return this.releaseStack()
         }
     }
 
@@ -499,13 +540,20 @@ export class GameClass {
         console.log("CARD", card)
         if (out == ReturnTrigger.CANCEL)
             this.setTriggerReturn(out)
-        this.releaseStack()
+        if (out == ReturnTrigger.ENDED) 
+            stack.ended = true;
+        else
+            this.releaseStack()
         if (out == undefined) return ReturnTrigger.CONTINUE
         return out
     }
 
     private async executeStackItem(): Promise<ReturnTrigger> {
         console.log("Running Stack", this.stack())
+        if (this.stack().ended) {
+            this.releaseStack()
+            return ReturnTrigger.CONTINUE
+        }
         switch (this.stack().function) {
             case StackFunctionType.PLAY_CARD:
                 await this.stack_playCard()
@@ -524,6 +572,9 @@ export class GameClass {
                 break;
             case StackFunctionType.ABILITY:
                 return this.executeAbility(this.stack())
+            case StackFunctionType.DEFEAT:
+                this.stack_defeatCard()
+                break
         }
         return ReturnTrigger.CONTINUE
     }
@@ -542,7 +593,8 @@ export class GameClass {
             input: input,
             childOutput: null,
             triggerData: undefined,
-            triggerReturn: ReturnTrigger.CONTINUE
+            triggerReturn: ReturnTrigger.CONTINUE,
+            ended: false,
         })
         this.newHeap()
     }
@@ -554,7 +606,8 @@ export class GameClass {
             input: input,
             childOutput: null,
             triggerData: undefined,
-            triggerReturn: ReturnTrigger.CONTINUE
+            triggerReturn: ReturnTrigger.CONTINUE,
+            ended: false
         })
         this.newHeap()
     }
@@ -1036,7 +1089,7 @@ export class GameClass {
     }
 
     public async postBaseDamage() {
-        
+
     }
 
     public async createTokenUnit(tokenUnit: TokenUnit, playerId: PlayerID) {

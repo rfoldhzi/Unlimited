@@ -2,9 +2,22 @@ import { Arena, Base, CardActive, CardID, CardUID, Game, PlayerID, PlayerState }
 import { GameClass } from "./gameClass";
 
 export enum ReturnTrigger {
+    /**
+     * Continue like normal
+     */
     CONTINUE = "",
+    /**
+     * Pause execution for ability target
+     */
     STOP = "Stop",
-    CANCEL = "Cancel",
+    /**
+     * // Cancel this action and the parent
+     */
+    CANCEL = "Cancel", 
+    /**
+     * This stack item has finished, but still has children
+     */
+    ENDED = "Ended"
 }
 
 export enum ExecutionStep {
@@ -17,6 +30,8 @@ export enum ExecutionStep {
     DEFENDER_COUNTER = "DEFENDER_COUNTER",
     DEFENDER_DEAL_DAMAGE = "DEFENDER_DEAL_DAMAGE",
     POST_ATTACK = "POST_ATTACK",
+    CHECK_DEFEAT = "CHECK_DEFEAT",
+    DEFEAT = "DEFEAT",
 }
 
 export enum Trigger {
@@ -25,6 +40,11 @@ export enum Trigger {
      * Data: cardID
      */
     PLAY,
+    /**
+     * Card is confirmed defeated
+     * 
+     * Data: cardID
+     */
     DEFEAT,
 
     /** Before maybe attack takes place
@@ -38,6 +58,13 @@ export enum Trigger {
      *  Data: attackerID, defenderID
     */
     UNIT_ATTACK,
+
+    /**
+     * After attack has dealt damage, but before units are defeated
+     * 
+     * Data: attackerID, defenderID
+     */
+    POST_UNIT_ATTACK,
 
     /** Before maybe base attack takes place
      * 
@@ -77,6 +104,11 @@ export enum Trigger {
     */
     CALC_COST,
     CARD_ENTER_LEAVE,
+    /** Before maybe defeat takes place
+     * 
+     *  Data: cardID
+    */
+    CHECK_DEFEAT,
 }   
 
 export enum EffectDuraction {
@@ -346,6 +378,50 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
                 if (attackerID != thisCard.cardID) return;
                 let defenderPlayerID: PlayerID = data.defenderPlayerID
                 game.players[defenderPlayerID]!.base.damage += 1
+            }
+        }
+    ],
+    ["8954587682"]: [ // Super laser technician
+        {
+            // become a ready resource
+            trigger: Trigger.DEFEAT,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.cardID != thisCard.cardID) return
+                game.players[thisCard.controllerID]?.resources.push(
+                    {
+                        ownerID: thisCard.ownerID,
+                        cardID: thisCard.cardID,
+                        cardUid: thisCard.cardUid
+                    }
+                )
+                game.players[thisCard.controllerID]!.totalResources += 1;
+                game.players[thisCard.controllerID]!.resourcesRemaining += 1;
+            }
+        }
+    ],
+    ["9394156877"]: [ // Dhani Pilgrim
+        {
+            // heal base 1
+            trigger: Trigger.DEFEAT,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.cardID != thisCard.cardID) return
+                game.players[thisCard.controllerID]!.base.damage -= 1;
+                if (game.players[thisCard.controllerID]!.base.damage < 0) {
+                    game.players[thisCard.controllerID]!.base.damage = 0
+                }
+
+            }
+        },
+        {
+            // heal base 1
+            trigger: Trigger.PLAY,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.cardID != thisCard.cardID) return
+                game.players[thisCard.controllerID]!.base.damage -= 1;
+                if (game.players[thisCard.controllerID]!.base.damage < 0) {
+                    game.players[thisCard.controllerID]!.base.damage = 0
+                }
+
             }
         }
     ]
