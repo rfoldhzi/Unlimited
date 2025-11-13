@@ -19,7 +19,7 @@ describe('Hidden Test', () => {
         expect(gameClass).toBeTruthy();
     })
 
-    it("should allow attack on sentinel", async () => {
+    it("should heal base on pilgrim's defeat", async () => {
         let gameClass = getGame()
         expect(gameClass.players["0"]?.base.damage).toBe(10) // Starting base damage
         await gameClass.attackCard("1", 2, 1) // "Dark Trooper" attack "Dhani Pilgrim"

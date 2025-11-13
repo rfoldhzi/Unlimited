@@ -21,7 +21,7 @@ describe('Hidden Test', () => {
         expect(gameClass).toBeTruthy();
     })
 
-    it("should allow attack on sentinel", async () => {
+    it("should not allow attack on hidden trooper", async () => {
         let gameClass = getGame()
         gameClass.data.turn = "1"
         await gameClass.attackCard("1", 2, 30) // "Hoth Trooper" attack "Vupltex"
