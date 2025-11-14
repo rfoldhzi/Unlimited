@@ -212,6 +212,7 @@ export class GameClass {
 
     private async stack_defeatCard() {
         let cardID: CardID = this.getInput().cardID
+        let killerID: CardID | undefined = this.getInput().killerID
 
         if (this.getStep() == ExecutionStep.NONE) {
             this.setStep(ExecutionStep.CHECK_DEFEAT)
@@ -254,6 +255,19 @@ export class GameClass {
             dealerID: dealerID,
             amount: amount
         })
+    }
+
+    public healDamage(cardID: CardID, amount: number) {
+        let card = this.findUnitAnyPlayer(cardID)
+        if (!card) return
+        if (card.damage <= 0) return
+        card.damage -= 0
+        if (card.damage <= 0) card.damage = 0
+        this.buffRemoval(EffectDuraction.DAMAGE_CHANGES);
+        this.setTriggerData({
+            cardID: cardID
+        })
+        this.triggerAbility(Trigger.DAMAGE_CHANGES)
     }
 
     private stack_dealDamage() {
@@ -305,7 +319,8 @@ export class GameClass {
 
             if (victim && victim.damage >= victim.hp)
                 this.createStackFunction(StackFunctionType.DEFEAT, {
-                    cardID: victim.cardID
+                    cardID: victim.cardID,
+                    killerID: dealerID,
                 })
 
             return
@@ -473,11 +488,13 @@ export class GameClass {
 
             if (attacker.damage >= attacker.hp) 
                 this.createStackFunction(StackFunctionType.DEFEAT, {
-                    cardID: attacker.cardID
+                    cardID: attacker.cardID,
+                    killerID: defenderID,
                 })
             if (defender.damage >= defender.hp)
                 this.createStackFunction(StackFunctionType.DEFEAT, {
-                    cardID: defender.cardID
+                    cardID: defender.cardID,
+                    killerID: attackerID,
                 })
 
             return 

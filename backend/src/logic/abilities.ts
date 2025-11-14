@@ -44,7 +44,7 @@ export enum Trigger {
     /**
      * Card is confirmed defeated
      * 
-     * Data: cardID
+     * Data: cardID, killerID
      */
     DEFEAT,
 
@@ -472,6 +472,58 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
                 return ReturnTrigger.ENDED
             }
         },
+    ],
+    ["2508430135"]: [ // Oggdo Bogdo
+        {
+            // Can't attack unless damaged
+            trigger: Trigger.CHECK_UNIT_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.attackerID != thisCard.cardID) return
+                if (thisCard.damage <= 0) return ReturnTrigger.CANCEL
+            }
+        },
+        {
+            // Can't attack unless damaged
+            trigger: Trigger.CHECK_BASE_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.attackerID != thisCard.cardID) return
+                if (thisCard.damage <= 0) return ReturnTrigger.CANCEL
+            }
+        },
+        {
+            // Heal on kill
+            trigger: Trigger.POST_UNIT_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.attackerID != thisCard.cardID) return
+                let defender: CardActive = game.findUnitAnyPlayer(data.defenderID)!;
+                if (!defender) game.healDamage(thisCard.cardID, 2) // If can't find defender (they died), heal 2
+                return ReturnTrigger.ENDED
+            }
+        },
+        // {
+        //     // Can't attack unless damaged
+        //     trigger: Trigger.UNIT_ATTACK,
+        //     effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+        //         if (data.attackerID != thisCard.cardID) return
+        //         let defender: CardActive = game.findUnitAnyPlayer(data.defenderID)!;
+        //         let buff: Buff = {
+        //             power: 0, hp: 0,
+        //             duration: EffectDuraction.END_OF_ATTACK,
+        //             abilityID: "2508430135", // Heal on defeat
+        //         }
+        //         game.applyBuff(defender, buff)
+        //     }
+        // },
+    ],
+    ["7504035101"]: [ // Loth-Wolf
+        {
+            // Unit cannot attack
+            trigger: Trigger.CHECK_UNIT_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.attackerID != thisCard.cardID) return
+                return ReturnTrigger.CANCEL
+            }
+        },
     ]
 }
 
@@ -493,5 +545,15 @@ export const BuffCardIDAbilities: {[key in CardUID]: Ability[]} = {
             }
         }
     ],
-    ["4328408486_2"]: [], // Incinerator Trooper marker to no longer block defender damage
+    ["4328408486_2"]: [], // Incinerator Trooper marker to no longer block defender damage,
+    // ["2508430135"]: [ // Oggdo Bogdo - Heal on defeat
+    //     {
+    //         trigger: Trigger.DEFEAT, // TEST CASE: Both units should die at same time, but could that change?
+    //         effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+    //             if (data.cardID != thisCard.cardID) return
+    //             let killer = game.findUnitAnyPlayer(data.killerID)
+    //             if (killer) game.healDamage(killer?.cardID, 2) 
+    //         }
+    //     }
+    // ],
 }
