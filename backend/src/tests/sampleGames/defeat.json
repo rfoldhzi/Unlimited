@@ -58,7 +58,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010055_EN_Dhani_Pilgrim_69154b8875.png",
                     "controllerID": "0",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 }
@@ -128,7 +128,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010080_EN_Imperial_Dark_Trooper_de4f5d0781.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 }

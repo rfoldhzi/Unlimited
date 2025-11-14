@@ -1,4 +1,4 @@
-import { CardKeyword, ExecutionStep, ReturnTrigger, Upgrade } from "../logic/abilities";
+import { CardKeyword, ExecutionStep, ReturnTrigger, Buff } from "../logic/abilities";
 
 export enum Aspect {
     VIGILANCE = "Vigilance",
@@ -71,7 +71,7 @@ export interface CardActive extends CardStats {
     ready: boolean,
     ownerID: PlayerID,
     controllerID: PlayerID,
-    upgrades: Upgrade[],
+    buffs: Buff[],
 }
 
 export interface PlayerState {

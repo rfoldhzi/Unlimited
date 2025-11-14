@@ -48,7 +48,7 @@ export enum Keyword {
     UNATTACKABLE,
 }
 
-export interface Upgrade {
+export interface Buff {
     power: number,
     hp: number,
     duration: EffectDuraction,
@@ -62,7 +62,7 @@ export interface CardKeyword {
 }
 
 
-export interface Upgrade {
+export interface Buff {
     power: number,
     hp: number,
     duration: EffectDuraction,

@@ -104,7 +104,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010075_EN_Scouting_TIE_Fighter_9fa35312d1.png",
                     "controllerID": "0",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 1
                 }
@@ -215,7 +215,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010093_EN_Surface_Assault_Bomber_cdd6751a55.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [
                         {
                             "keyword": 0,
@@ -239,7 +239,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010075_EN_Scouting_TIE_Fighter_9fa35312d1.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 1
                 }

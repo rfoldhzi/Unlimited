@@ -87,7 +87,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010038_EN_Hoth_Trooper_dbbbff9f1e.png",
                     "controllerID": "0",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -106,7 +106,7 @@
                     "ready": false,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_05010245_EN_Vulptex_4c37969f34.png",
                     "controllerID": "0",
-                    "upgrades": [
+                    "buffs": [
                         {
                             "power": 0,
                             "hp": 0,
@@ -225,7 +225,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010038_EN_Hoth_Trooper_dbbbff9f1e.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -245,7 +245,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_05010044_EN_Loth_Wolf_278b8954fd.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [
                         {
                             "keyword": 2,

@@ -129,7 +129,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010038_EN_Hoth_Trooper_dbbbff9f1e.png",
                     "controllerID": "0",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -149,7 +149,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_05010046_EN_Ezra_Bridger_49c1a07209.png",
                     "controllerID": "0",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -168,7 +168,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010055_EN_Dhani_Pilgrim_69154b8875.png",
                     "controllerID": "0",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -187,7 +187,7 @@
                     "ready": false,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_05010055_EN_Dume_c9b5eb7c20.png",
                     "controllerID": "0",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 }
@@ -324,7 +324,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010077_EN_Snowtrooper_9af384c095.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -343,7 +343,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com/card_SWH_01_228_Viper_Probe_Droid_91a557b6cf.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -362,7 +362,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com/card_SWH_01_228_Viper_Probe_Droid_91a557b6cf.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [],
                     "arena": 0
                 },
@@ -381,7 +381,7 @@
                     "ready": true,
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010113_EN_Daro_Commando_6453c96919.png",
                     "controllerID": "1",
-                    "upgrades": [],
+                    "buffs": [],
                     "keywords": [
                         {
                             "keyword": 1,

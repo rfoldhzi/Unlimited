@@ -24,7 +24,7 @@ export default function Info({ playerID, onSend, lastMessage }: Props) {
 
   if (lastMessage && lastMessage.charAt(0) == "{") {
     let game = JSON.parse(lastMessage) as Game
-    let player = game.players[PlayerName]!
+    let player = game.players[playerID]!
     totalResources = player.totalResources
     remainingResources = player.resourcesRemaining
     yourTurn = game.turn == PlayerName && game.phase == Phase.ACTION && playerID == PlayerName

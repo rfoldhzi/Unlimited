@@ -1,5 +1,5 @@
 import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType } from "../models/game";
-import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, TokenUnit, Trigger, Upgrade, UpgradeCardIDAbilities } from "./abilities";
+import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, TokenUnit, Trigger, Buff, BuffCardIDAbilities } from "./abilities";
 import { createCard } from "./gameHandler";
 
 
@@ -284,7 +284,7 @@ export class GameClass {
                 // Deal damage to non-dealer because damage wasn't canceled
                 if (victim) {
                     victim.damage += this.getTriggerData().amount // Here we can expect the data to change with the ability
-                    this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+                    this.buffRemoval(EffectDuraction.DAMAGE_CHANGES);
                     this.setTriggerData({
                         cardID: attackerID
                     })
@@ -337,7 +337,7 @@ export class GameClass {
 
         if (this.getStep() == ExecutionStep.POST_ATTACK) {
             //Post Attack is first because attacker and defender might be dead
-            this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+            this.buffRemoval(EffectDuraction.END_OF_ATTACK);
             return this.releaseStack()
         }
         
@@ -426,7 +426,7 @@ export class GameClass {
                 // Deal damage to defender because damage wasn't canceled
                 console.log("TRIGGER")
                 defender.damage += this.getTriggerData().amount // Here we can expect the data to change with the ability
-                this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+                this.buffRemoval(EffectDuraction.DAMAGE_CHANGES);
                 this.setTriggerData({
                     cardID: defenderID
                 })
@@ -452,7 +452,7 @@ export class GameClass {
             if (this.getTriggerReturn() != ReturnTrigger.CANCEL) {
                 // Deal damage to attacker because damage wasn't canceled
                 attacker.damage += this.getTriggerData().amount // Here we can expect the data to change with the ability
-                this.upgradeRemoval(EffectDuraction.DAMAGE_CHANGES);
+                this.buffRemoval(EffectDuraction.DAMAGE_CHANGES);
                 this.setTriggerData({
                     cardID: attackerID
                 })
@@ -581,7 +581,7 @@ export class GameClass {
             defenderBase.damage += attacker.power
 
             if (defenderBase.damage >= defenderBase.hp) this.victory(playerID)
-            this.upgradeRemoval(EffectDuraction.END_OF_ATTACK);
+            this.buffRemoval(EffectDuraction.END_OF_ATTACK);
             return this.releaseStack()
         }
     }
@@ -610,7 +610,7 @@ export class GameClass {
                 out = ability.effect(card, this, this.getParentTriggerData(), stack.input.number)
                 break;
             case AbilityType.UPGRADE:
-                ability = UpgradeCardIDAbilities[stack.input.abilityKey as CardUID]![stack.input.abilityIndex]!
+                ability = BuffCardIDAbilities[stack.input.abilityKey as CardUID]![stack.input.abilityIndex]!
                 out = ability.effect(card, this, this.getParentTriggerData())
                 break;
             case AbilityType.CARD:
@@ -888,7 +888,7 @@ export class GameClass {
 
     public async regroup() {
 
-        this.upgradeRemoval(EffectDuraction.END_OF_PHASE);
+        this.buffRemoval(EffectDuraction.END_OF_PHASE);
 
         this.data.phase = Phase.REGROUP
         this.data.initiativeClaimed = false
@@ -1052,10 +1052,10 @@ export class GameClass {
         console.log("went through all players, couldn't find one ready??")
     }
 
-    public async applyUpgrade(card: CardActive, upgrade: Upgrade) {
-        card.upgrades.push(upgrade);
-        card.power += upgrade.power;
-        card.hp += upgrade.hp;
+    public async applyBuff(card: CardActive, buff: Buff) {
+        card.buffs.push(buff);
+        card.power += buff.power;
+        card.hp += buff.hp;
         
     }
 
@@ -1097,16 +1097,16 @@ export class GameClass {
                     }
                 }
             }
-            for (let upgrade of card.upgrades) {
-                //Trigger card specific upgrade abilities
-                if (UpgradeCardIDAbilities[upgrade.abilityID || ""]) { // Find ability based on id of card that created the upgrade
-                    for (let index in UpgradeCardIDAbilities[upgrade.abilityID!]!) {
-                        let ability = UpgradeCardIDAbilities[upgrade.abilityID!]![index]!
+            for (let buff of card.buffs) {
+                //Trigger card specific buff abilities
+                if (BuffCardIDAbilities[buff.abilityID || ""]) { // Find ability based on id of card that created the buff
+                    for (let index in BuffCardIDAbilities[buff.abilityID!]!) {
+                        let ability = BuffCardIDAbilities[buff.abilityID!]![index]!
                         if (ability.trigger == trigger) {
                             this.createAbilityStackFunction(StackFunctionType.ABILITY, {
                                 cardID: card.cardID,
                                 abilityType: AbilityType.UPGRADE,
-                                abilityKey: upgrade.abilityID,
+                                abilityKey: buff.abilityID,
                                 abilityIndex: index,
                             })
                             // let output = ability.effect(card, this, data)
@@ -1114,19 +1114,19 @@ export class GameClass {
                         }
                     }
                 }
-                // Trigger abilities of keywords on upgrades
-                if (upgrade.keyword) {
-                    for (let index in KeyWordAbilites[upgrade.keyword.keyword]) {
-                        let ability = KeyWordAbilites[upgrade.keyword.keyword][index]!
+                // Trigger abilities of keywords on buffs
+                if (buff.keyword) {
+                    for (let index in KeyWordAbilites[buff.keyword.keyword]) {
+                        let ability = KeyWordAbilites[buff.keyword.keyword][index]!
                         if (ability.trigger == trigger) {
                             this.createAbilityStackFunction(StackFunctionType.ABILITY, {
                                 cardID: card.cardID,
                                 abilityType: AbilityType.KEYWORD,
-                                abilityKey: upgrade.keyword.keyword,
+                                abilityKey: buff.keyword.keyword,
                                 abilityIndex: index,
-                                number: upgrade.keyword.number
+                                number: buff.keyword.number
                             })
-                            // let output = ability.effect(card, this, data, upgrade.keyword.number)
+                            // let output = ability.effect(card, this, data, buff.keyword.number)
                             // if (output !== undefined) return output
                         }
                     }
@@ -1155,16 +1155,16 @@ export class GameClass {
         return ReturnTrigger.CONTINUE
     }
 
-    public upgradeRemoval(duration: EffectDuraction) {
+    public buffRemoval(duration: EffectDuraction) {
         let cards = this.getEveryUnit();
         cards.forEach((card: CardActive) => {
-            let i = card.upgrades.length - 1
+            let i = card.buffs.length - 1
             while (i >= 0) {
-                let upgrade = card.upgrades[i]
-                if (upgrade?.duration == duration) {
-                    card.upgrades.splice(i, 1)
-                    card.power -= upgrade.power
-                    card.hp -= upgrade.hp
+                let buff = card.buffs[i]
+                if (buff?.duration == duration) {
+                    card.buffs.splice(i, 1)
+                    card.power -= buff.power
+                    card.hp -= buff.hp
                 }
                 i--
             }

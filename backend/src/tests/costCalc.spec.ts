@@ -76,7 +76,7 @@ describe('Cost Calculation Test', () => {
                 ownerID: "1",
                 power: 3,
                 ready: false,
-                upgrades: [],
+                buffs: [],
                 cardID: 0
             }
             return card

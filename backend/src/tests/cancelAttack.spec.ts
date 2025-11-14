@@ -63,7 +63,7 @@ describe('Cancel Attack Test', () => {
                 ownerID: "1",
                 power: 3,
                 ready: false,
-                upgrades: [],
+                buffs: [],
                 cardID: 0
             }
             return card
@@ -76,7 +76,7 @@ describe('Cancel Attack Test', () => {
         await gameClass.attackCard("0", 7, 10) // "Dhani Pilgrim" attack "Vupltex"
         expect(gameClass.data.turn).toBe("0") // Should cancel attack because vulptex is hidden
         let vulp = gameClass.players["1"]?.groundArena.find((card: CardActive) => card.cardID == 10)
-        console.log("vulp uograde", vulp?.upgrades)
+        console.log("vulp uograde", vulp?.buffs)
         expect(vulp?.damage).toBe(0) // Vulp should take no damage as attack is canceled
     })
 })

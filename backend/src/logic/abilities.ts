@@ -145,7 +145,7 @@ export interface Ability {
     effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => ReturnTrigger | void,
 }
 
-export interface Upgrade {
+export interface Buff {
     power: number,
     hp: number,
     duration: EffectDuraction,
@@ -166,12 +166,12 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                 let attackerID: CardID = data.attackerID;
                 if (attackerID != thisCard.cardID) return;
 
-                let upgrade: Upgrade = {
+                let buff: Buff = {
                     power: number || 1,
                     hp: 0,
                     duration: EffectDuraction.END_OF_ATTACK,
                 }
-                game.applyUpgrade(thisCard, upgrade)
+                game.applyBuff(thisCard, buff)
             }
         },
         {
@@ -180,12 +180,12 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                 let attackerID: CardID = data.attackerID;
                 if (attackerID != thisCard.cardID) return;
 
-                let upgrade: Upgrade = {
+                let buff: Buff = {
                     power: number || 1,
                     hp: 0,
                     duration: EffectDuraction.END_OF_ATTACK,
                 }
-                game.applyUpgrade(thisCard, upgrade)
+                game.applyBuff(thisCard, buff)
             }
         }
     ],
@@ -266,12 +266,12 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
         {
             trigger: Trigger.DAMAGE_CHANGES,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                let upgrade: Upgrade = {
+                let buff: Buff = {
                     power: thisCard.damage,
                     hp: 0,
                     duration: EffectDuraction.DAMAGE_CHANGES,
                 }
-                game.applyUpgrade(thisCard, upgrade)
+                game.applyBuff(thisCard, buff)
             }
         }
     ],
@@ -281,7 +281,7 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
                 let cardID: CardID = data.cardID;
                 if (cardID == thisCard.cardID) {
-                    let upgrade: Upgrade = {
+                    let buff: Buff = {
                         power: 0,
                         hp: 0,
                         duration: EffectDuraction.END_OF_PHASE,
@@ -290,7 +290,7 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                             number: 0
                         }
                     }
-                    game.applyUpgrade(thisCard, upgrade)
+                    game.applyBuff(thisCard, buff)
                 }
             }
         },
@@ -431,28 +431,28 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
         { 
             // Ability is to deal damage before the defender
             // Solution is to block damage dealtt during attack, and 
-            // give defender upgrade to deal damage post_attack
+            // give defender buff to deal damage post_attack
             trigger: Trigger.DEAL_DAMAGE,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
                 if (data.attackerID != thisCard.cardID) return
                 if (data.defenderID != data.dealerID) return
                 // Don't block damage if marked by self (marked means he already blocked the damage earlier)
-                if (thisCard.upgrades.find((u: Upgrade) => u.abilityID == "4328408486_2")) return 
+                if (thisCard.buffs.find((u: Buff) => u.abilityID == "4328408486_2")) return 
                 let defender: CardActive = game.findUnitAnyPlayer(data.defenderID)!;
-                let upgrade: Upgrade = {
+                let buff: Buff = {
                     power: 0,
                     hp: 0,
                     duration: EffectDuraction.END_OF_ATTACK,
                     abilityID: "4328408486",
                 }
-                game.applyUpgrade(defender, upgrade)
-                let upgrade2: Upgrade = {
+                game.applyBuff(defender, buff)
+                let buff2: Buff = {
                     power: 0,
                     hp: 0,
                     duration: EffectDuraction.END_OF_ATTACK,
                     abilityID: "4328408486_2",
                 }
-                game.applyUpgrade(thisCard, upgrade2)
+                game.applyBuff(thisCard, buff2)
                 return ReturnTrigger.CANCEL
             }
         }]
@@ -460,10 +460,10 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
 
 
 
-export const UpgradeCardIDAbilities: {[key in CardUID]: Ability[]} = {
+export const BuffCardIDAbilities: {[key in CardUID]: Ability[]} = {
     ["4328408486"]: [ // Incinerator Trooper mechanics
         {
-            // This upgrade allows for damage after the attack from the defender
+            // This buff allows for damage after the attack from the defender
             trigger: Trigger.POST_UNIT_ATTACK, // expires after this
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
                 if (data.defenderID != thisCard.cardID) return

@@ -155,7 +155,7 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
         ready: true,
         imgURL: data.attributes.artFront.data.attributes.formats.card.url,
         controllerID: "0",
-        upgrades: [],
+        buffs: [],
         keywords: []
     }
     if (cardUid in CardIDKeywords) {
