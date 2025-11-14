@@ -1,0 +1,316 @@
+{
+    "gameID": 0,
+    "cardCount": 22,
+    "players": {
+        "0": {
+            "playerID": "0",
+            "base": {
+                "cardUid": "0507674993",
+                "aspect": "Command",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "6088773439",
+                    "aspects": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "2529211493",
+                "3347454174"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 3,
+                    "cardUid": "0097256640"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 6,
+                    "cardUid": "8986035098"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 9,
+                    "cardUid": "8986035098"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 11,
+                    "cardUid": "1557302740"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 14,
+                    "cardUid": "6867378216"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 18,
+                    "cardUid": "1087522061"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 21,
+                    "cardUid": "6867378216"
+                }
+            ],
+            "deck": [
+                "9655836052",
+                "4843225228",
+                "9127322562"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 1,
+                    "cardUid": "2529211493",
+                    "name": "Imperial Dark Trooper",
+                    "hp": 3,
+                    "power": 3,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Command",
+                        "Villainy"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010080_EN_Imperial_Dark_Trooper_de4f5d0781.png",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "keywords": [],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [
+                {
+                    "cardID": 7,
+                    "cardUid": "8746311599",
+                    "name": "Prototype TIE Advanced",
+                    "hp": 3,
+                    "power": 4,
+                    "cost": 3,
+                    "aspectCost": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_04010136_EN_Prototype_TIE_Advanced_0d010986dd.png",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "keywords": [],
+                    "arena": 1
+                },
+                {
+                    "cardID": 13,
+                    "cardUid": "2657417747",
+                    "name": "Quasar TIE Carrier",
+                    "hp": 7,
+                    "power": 5,
+                    "cost": 6,
+                    "aspectCost": [
+                        "Villainy"
+                    ],
+                    "ownerID": "0",
+                    "damage": 4,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_04010243_EN_Quasar_TIE_Carrier_e98400d78c.png",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "keywords": [],
+                    "arena": 1
+                },
+                {
+                    "cardID": 16,
+                    "cardUid": "7268926664",
+                    "name": "Tie Fighter",
+                    "hp": 1,
+                    "power": 1,
+                    "cost": 0,
+                    "aspectCost": [
+                        "Villany"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F04010_T01_EN_TIE_Fighter_797390e528.png&w=1200&q=75",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "keywords": [],
+                    "arena": 1
+                },
+                {
+                    "cardID": 20,
+                    "cardUid": "7268926664",
+                    "name": "Tie Fighter",
+                    "hp": 1,
+                    "power": 1,
+                    "cost": 0,
+                    "aspectCost": [
+                        "Villany"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F04010_T01_EN_TIE_Fighter_797390e528.png&w=1200&q=75",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "keywords": [],
+                    "arena": 1
+                }
+            ],
+            "discard": [],
+            "totalResources": 9,
+            "resourcesRemaining": 9,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
+                "cardUid": "2376813177",
+                "aspect": "Cunning",
+                "hp": 30,
+                "damage": 5
+            },
+            "leaders": [
+                {
+                    "cardUid": "8304104587",
+                    "aspects": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "0726963200",
+                "6930799884"
+            ],
+            "resources": [
+                {
+                    "ownerID": "1",
+                    "cardID": 4,
+                    "cardUid": "7249575408"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 5,
+                    "cardUid": "7249575408"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 10,
+                    "cardUid": "2508430135"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 12,
+                    "cardUid": "2404240951"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 15,
+                    "cardUid": "9394156877"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 19,
+                    "cardUid": "3842468148"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 22,
+                    "cardUid": "8613908567"
+                }
+            ],
+            "deck": [
+                "5663262393",
+                "1162729042",
+                "3591040205",
+                "7298144465",
+                "8613908567",
+                "7983965297",
+                "9213315483",
+                "9430527677",
+                "2508430135",
+                "6930799884",
+                "8613908567"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 2,
+                    "cardUid": "7504035101",
+                    "name": "Loth-Wolf",
+                    "hp": 3,
+                    "power": 3,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Vigilance",
+                        "Heroism"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_05010044_EN_Loth_Wolf_278b8954fd.png",
+                    "controllerID": "1",
+                    "buffs": [],
+                    "keywords": [
+                        {
+                            "keyword": 2,
+                            "number": 0
+                        }
+                    ],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [
+                {
+                    "cardID": 17,
+                    "cardUid": "3469756679",
+                    "name": "Heroic ARC-170",
+                    "hp": 3,
+                    "power": 4,
+                    "cost": 4,
+                    "aspectCost": [
+                        "Heroism"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010254_EN_Heroic_ARC_170_e26be11fe2.png",
+                    "controllerID": "1",
+                    "buffs": [],
+                    "keywords": [],
+                    "arena": 1
+                }
+            ],
+            "discard": [],
+            "totalResources": 9,
+            "resourcesRemaining": 9,
+            "finished": false,
+            "cardsToResource": 0
+        }
+    },
+    "name": "Cloud",
+    "initiative": "0",
+    "turn": "0",
+    "phase": 0,
+    "initiativeClaimed": false,
+    "subPhase": 0,
+    "targets": [],
+    "heap": [],
+    "stack": []
+}

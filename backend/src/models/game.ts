@@ -103,6 +103,7 @@ export interface StackItem {
 export enum StackFunctionType {
     CALC_COST = "CALC_COST",
     PLAY_CARD = "PLAY_CARD",
+    CREATE_TOKEN = "CREATE_TOKEN",
     END_TURN = "END_TURN",
     ATTACK_UNIT = "ATTACK_UNIT",
     ATTACK_BASE = "ATTACK_BASE",

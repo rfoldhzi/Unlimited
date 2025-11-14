@@ -1,6 +1,6 @@
 import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType } from "../models/game";
-import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, TokenUnit, Trigger, Buff, BuffCardIDAbilities } from "./abilities";
-import { createCard } from "./gameHandler";
+import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, Trigger, Buff, BuffCardIDAbilities } from "./abilities";
+import { createCard, Token, TokenUnit } from "./gameHandler";
 
 
 export class GameClass {
@@ -639,6 +639,9 @@ export class GameClass {
             case StackFunctionType.PLAY_CARD:
                 await this.stack_playCard()
                 break;
+            case StackFunctionType.CREATE_TOKEN:
+                await this.stack_createTokenUnit()
+                break;
             case StackFunctionType.ATTACK_UNIT:
                 await this.stack_attackCard()
                 break;
@@ -883,6 +886,59 @@ export class GameClass {
         }
         if (this.getStep() == ExecutionStep.POST_PLAY) {
             return this.releaseStack() // Must be last step
+        }
+    }
+
+    public async createTokenUnit(playerId: PlayerID, token: Token) {
+        this.createStackFunction(StackFunctionType.CREATE_TOKEN, {
+            token: token,
+            playerId: playerId,
+        })
+        await this.runStack()
+    }
+
+    /**
+     * Input:
+     * 
+     * cardUid: CardUID
+     * playerId: PlayerID
+     */
+    private async stack_createTokenUnit() {
+        let playerId: PlayerID = this.getInput().playerId
+        let token: Token = this.getInput().token
+
+        // Generate card 
+        if (this.getStep() == ExecutionStep.NONE) {
+
+            console.log("playCard1")
+
+            this.heap().playerId = playerId
+            let card = JSON.parse(JSON.stringify(TokenUnit[token])) as CardActive
+
+            card.ownerID = playerId;
+            card.controllerID = playerId;
+            card.ready = false;
+
+            this.data.cardCount += 1;
+            card.cardID = this.data.cardCount;
+
+            console.log("true heap", this.data.heap)
+            console.log("heap",this.heap())
+
+            this.heap().card = card
+            let player = this.players[playerId]!
+            if (this.heap().card.arena == Arena.GROUND) {
+                player.groundArena.push(this.heap().card)
+            } else if (this.heap().card.arena == Arena.SPACE) {
+                player.spaceArena.push(this.heap().card)
+            }
+
+            this.endStack()
+
+            this.buffRemoval(EffectDuraction.CARD_ENTER_LEAVE)
+            this.triggerAbility(Trigger.CARD_ENTER_LEAVE)
+            
+            return 
         }
     }
 
@@ -1181,28 +1237,6 @@ export class GameClass {
     }
 
     public async postBaseDamage() {
-
-    }
-
-    public async createTokenUnit(tokenUnit: TokenUnit, playerId: PlayerID) {
-
-        let player = this.players[playerId]!
-        let card = await createCard(tokenUnit)
-        if (card == null) {
-            return
-        }
-
-        card.ownerID = playerId;
-        card.controllerID = playerId;
-
-        this.data.cardCount += 1;
-        card.cardID = this.data.cardCount;
-
-        if (card.arena == Arena.GROUND) {
-            player.groundArena.push(card)
-        } else if (card.arena == Arena.SPACE) {
-            player.spaceArena.push(card)
-        }
 
     }
 }

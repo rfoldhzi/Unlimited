@@ -1,5 +1,6 @@
 import { Arena, Base, CardActive, CardID, CardUID, Game, PlayerID, PlayerState } from "../models/game";
 import { GameClass } from "./gameClass";
+import { Token } from "./gameHandler";
 
 export enum ReturnTrigger {
     /**
@@ -152,11 +153,6 @@ export interface Buff {
     abilityID?: CardUID,
     keyword?: CardKeyword,
 }
-
-export enum TokenUnit {
-    CLONE_TROOPER = "3941784506",
-}
-
 
 export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
     [Keyword.RAID]: [
@@ -455,7 +451,28 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
                 game.applyBuff(thisCard, buff2)
                 return ReturnTrigger.CANCEL
             }
-        }]
+        }
+    ],
+    ["2657417747"]: [ // Quasar Tie Carrier
+        {
+            // Create Tie token on attack
+            trigger: Trigger.UNIT_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.attackerID != thisCard.cardID) return
+                game.createTokenUnit(thisCard.controllerID, Token.TIE_FIGHTER)
+                return ReturnTrigger.ENDED
+            }
+        },
+        {
+            // Create Tie token on attack
+            trigger: Trigger.BASE_ATTACK,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (data.attackerID != thisCard.cardID) return
+                game.createTokenUnit(thisCard.controllerID, Token.TIE_FIGHTER)
+                return ReturnTrigger.ENDED
+            }
+        },
+    ]
 }
 
 

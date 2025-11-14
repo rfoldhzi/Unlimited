@@ -134,6 +134,84 @@ export async function fetchCard(cardUid: CardUID) {
 
 }
 
+export enum Token {
+    TIE_FIGHTER = "TIE FIGHTER",
+    X_WING = "X-WING",
+    BATTLE_DROID = "BATTLE DROID",
+    CLONE_TROOPER = "CLONE TROOPER",
+}
+
+export const TokenUnit: {[key in Token]: CardActive} = {
+    [Token.TIE_FIGHTER]: {
+        cardID: 0,
+        cardUid: "7268926664",
+        name: "Tie Fighter",
+        hp: 1,
+        power: 1,
+        cost: 0,
+        aspectCost: [Aspect.VILLANY],
+        ownerID: "",
+        damage: 0,
+        ready: false,
+        imgURL: "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F04010_T01_EN_TIE_Fighter_797390e528.png&w=1200&q=75",
+        controllerID: "0",
+        buffs: [],
+        keywords: [],
+        arena: Arena.SPACE,
+    },
+    [Token.X_WING]: {
+        cardID: 0,
+        cardUid: "9415311381",
+        name: "X-Wing",
+        hp: 2,
+        power: 2,
+        cost: 0,
+        aspectCost: [Aspect.HEROISM],
+        ownerID: "",
+        damage: 0,
+        ready: false,
+        imgURL: "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F04010_T02_EN_X_Wing_23535e05f0.png&w=1200&q=75",
+        controllerID: "0",
+        buffs: [],
+        keywords: [],
+        arena: Arena.SPACE,
+    },
+    [Token.BATTLE_DROID]: {
+        cardID: 0,
+        cardUid: "3463348370",
+        name: "Battle Droid",
+        hp: 1,
+        power: 1,
+        cost: 0,
+        aspectCost: [Aspect.VILLANY],
+        ownerID: "",
+        damage: 0,
+        ready: false,
+        imgURL: "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F0301_T01_EN_Battle_Droid_f1580df691.png&w=1200&q=75",
+        controllerID: "0",
+        buffs: [],
+        keywords: [],
+        arena: Arena.SPACE,
+    },
+    [Token.CLONE_TROOPER]: {
+        cardID: 0,
+        cardUid: "3941784506",
+        name: "Clone Trooper",
+        hp: 2,
+        power: 2,
+        cost: 0,
+        aspectCost: [Aspect.HEROISM],
+        ownerID: "",
+        damage: 0,
+        ready: false,
+        imgURL: "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F0301_T02_EN_Clone_Trooper_d915e8d856.png&w=1200&q=75",
+        controllerID: "0",
+        buffs: [],
+        keywords: [],
+        arena: Arena.SPACE,
+    },
+}
+
 export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
     let data: any = await fetchCard(cardUid)
     data = data.data.data
