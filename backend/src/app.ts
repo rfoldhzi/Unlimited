@@ -123,6 +123,15 @@ wss.on('connection', (ws: any) => {
                 let gameClass = new GameClass(game!)
                 await gameClass.resourceCard(cardUid, player)
                 sendAll(JSON.stringify(game))
+            } else if (split[0] == "Target") {
+
+                let player = split[1]!
+                let targets = split[2].split(",")
+                
+                let game = await sampleGame(false, player)
+                let gameClass = new GameClass(game!)
+                await gameClass.setTargets(targets)
+                sendAll(JSON.stringify(game))
             } else {
                 // Echo message back to the client
                 ws.send(`Server received: ${message}`);

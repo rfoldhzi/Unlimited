@@ -1,4 +1,4 @@
-import { CardKeyword, Buff } from "../logic/abilities";
+import type { Buff, CardKeyword } from "./abilities.ts";
 
 export enum Aspect {
     VIGILANCE = "Vigilance",
@@ -72,6 +72,11 @@ export interface CardActive extends CardStats {
     ownerID: PlayerID,
     controllerID: PlayerID,
     buffs: Buff[],
+    upgrades: UpgradeActive[],
+}
+
+export interface UpgradeActive extends CardStats {
+    parentCardID: CardID,
 }
 
 export interface PlayerState {

@@ -72,6 +72,11 @@ export interface CardActive extends CardStats {
     ownerID: PlayerID,
     controllerID: PlayerID,
     buffs: Buff[],
+    upgrades: UpgradeActive[],
+}
+
+export interface UpgradeActive extends CardStats {
+    parentCardID: CardID,
 }
 
 export interface PlayerState {
@@ -112,6 +117,34 @@ export enum StackFunctionType {
     DEAL_DAMAGE = "DEAL_DAMAGE",
 }
 
+export enum TargetType {
+    UNIT = "UNIT",
+    BASE = "BASE",
+    HAND = "HAND",
+    /**
+     * Pick from string option list
+     * 
+     * Must set target info options list for player to choose from
+     */
+    OPTIONS = "OPTIONS"
+}   
+
+export enum TargetCount {
+    ONE = "ONE",
+    ANY = "ANY",
+}
+
+export interface TargetInfo {
+    active: boolean,
+    player: PlayerID,
+    count: TargetCount,
+    type: TargetType,
+    options: string[],
+    targets: string[],
+    cardUid: CardUID,
+    text: string,
+}
+
 export interface Game {
     gameID: number;
     players: {[playerID: string] : PlayerState;}
@@ -121,16 +154,12 @@ export interface Game {
     initiativeClaimed: boolean;
     phase: Phase;
     subPhase: SubPhase;
-    targets: any[];
-    targetCount?: {
-        min: Number,
-        max: Number,
-    }
     cardCount: number,
     winner?: PlayerID,
     playedCard?: CardActive | undefined;
     heap: any[];
     stack: (StackItem | StackItem[])[];
+    targetInfo: TargetInfo,
 }
 
 export let games: Game[] = [];

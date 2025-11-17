@@ -1,4 +1,4 @@
-import { Arena, Base, CardActive, CardID, CardUID, Game, PlayerID, PlayerState } from "../models/game";
+import { Arena, Base, CardActive, CardID, CardUID, Game, PlayerID, PlayerState, TargetCount, TargetType } from "../models/game";
 import { GameClass } from "./gameClass";
 import { Token } from "./gameHandler";
 
@@ -8,9 +8,13 @@ export enum ReturnTrigger {
      */
     CONTINUE = "",
     /**
+     * Ability conditions not met
+     */
+    NO_EFFECT = "No_Effect",
+    /**
      * Pause execution for ability target
      */
-    STOP = "Stop",
+    TARGET = "Target",
     /**
      * // Cancel this action and the parent
      */
@@ -18,7 +22,11 @@ export enum ReturnTrigger {
     /**
      * This stack item has finished, but still has children
      */
-    ENDED = "Ended"
+    ENDED = "Ended",
+    /**
+     * This abilty stack has not finished, has children
+     */
+    UNFINISHED = "UNFINISHED",
 }
 
 export enum ExecutionStep {
@@ -33,6 +41,8 @@ export enum ExecutionStep {
     POST_ATTACK = "POST_ATTACK",
     CHECK_DEFEAT = "CHECK_DEFEAT",
     DEFEAT = "DEFEAT",
+    ABILITY_1 = "ABILITY_1",
+    ABILITY_2 = "ABILITY_2",
 }
 
 export enum Trigger {
@@ -101,7 +111,7 @@ export enum Trigger {
      * 
      *  Data: cardID, amount
      * 
-     *  Update amount if data changes
+     *  Update data.amount if data changes
     */
     CALC_COST,
     CARD_ENTER_LEAVE,
@@ -117,6 +127,7 @@ export enum EffectDuraction {
     END_OF_PHASE,
     CARD_ENTER_LEAVE,
     DAMAGE_CHANGES,
+    UPGRADE,
     NEVER
 }
 
@@ -128,6 +139,7 @@ export enum Keyword {
     GRIT,
     HIDDEN,
     UNATTACKABLE,
+    EXPLOIT,
 }
 
 export interface CardKeyword {
@@ -137,7 +149,7 @@ export interface CardKeyword {
 
 export enum AbilityType { // Type so stack knows which dictionary ability is in
     KEYWORD,
-    UPGRADE,
+    BUFF,
     CARD,
 }
 
@@ -166,8 +178,8 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                     power: number || 1,
                     hp: 0,
                     duration: EffectDuraction.END_OF_ATTACK,
-                }
-                game.applyBuff(thisCard, buff)
+                };
+                game.applyBuff(thisCard, buff);
             }
         },
         {
@@ -180,8 +192,8 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                     power: number || 1,
                     hp: 0,
                     duration: EffectDuraction.END_OF_ATTACK,
-                }
-                game.applyBuff(thisCard, buff)
+                };
+                game.applyBuff(thisCard, buff);
             }
         }
     ],
@@ -192,19 +204,19 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
                 let dealerID: CardID = data.dealerID;
                 let attackerID: CardID = data.attackerID;
-                if (dealerID != thisCard.cardID) return;
-                if (attackerID != thisCard.cardID) return;
+                if (dealerID != thisCard.cardID) return ReturnTrigger.NO_EFFECT;
+                if (attackerID != thisCard.cardID) return ReturnTrigger.NO_EFFECT;
 
                 let damage: number = data.damage;
                 let defender: CardActive | undefined = game.findUnitAnyPlayer(data.defenderID);
-                if (!defender) return
+                if (!defender) return ReturnTrigger.NO_EFFECT;
                 let baseDamage = 0;
                 if (damage > (defender.hp - defender.damage)) {
-                    baseDamage = damage - (defender.hp - defender.damage)
-                    let enemyBase: Base = game.players[defender.controllerID]?.base!
-                    enemyBase.damage += baseDamage
+                    baseDamage = damage - (defender.hp - defender.damage);
+                    let enemyBase: Base = game.players[defender.controllerID]?.base!;
+                    enemyBase.damage += baseDamage;
                     // Base Damage Trigger
-                } 
+                }
             }
         }
     ],
@@ -218,17 +230,17 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                 let defender: CardActive = game.findUnitAnyPlayer(defenderID)!;
                 // Ignore if the defender and sentinal are different teams
                 if (defender.controllerID != thisCard.controllerID) {
-                    return ReturnTrigger.CONTINUE
+                    return ReturnTrigger.NO_EFFECT;
                 }
                 // Ignore if the defender has sentinal
                 if (defender.keywords.find(
                     (keyword: CardKeyword) => keyword.keyword == Keyword.SENTINAL
                 )) {
-                    return ReturnTrigger.CONTINUE
+                    return ReturnTrigger.NO_EFFECT;
                 }
                 // Cancel attack if the sentinal in the same arena as attacker
                 if (thisCard.arena == attacker.arena) {
-                    return ReturnTrigger.CANCEL
+                    return ReturnTrigger.CANCEL;
                 }
             }
         },
@@ -237,15 +249,15 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
                 let attackerID: CardID = data.attackerID;
                 let attacker: CardActive = game.findUnitAnyPlayer(attackerID)!;
-                let defenderPlayerID: PlayerID = data.defenderPlayerID
-                
+                let defenderPlayerID: PlayerID = data.defenderPlayerID;
+
                 // Ignore if the defender and sentinal are different teams
                 if (defenderPlayerID != thisCard.controllerID) {
-                    return ReturnTrigger.CONTINUE
+                    return ReturnTrigger.NO_EFFECT;
                 }
                 // Cancel attack if the sentinal in the same arena as attacker
                 if (thisCard.arena == attacker.arena) {
-                    return ReturnTrigger.CANCEL
+                    return ReturnTrigger.CANCEL;
                 }
             }
         },
@@ -254,7 +266,38 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
         {
             trigger: Trigger.PLAY,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                
+                if (game.getStep() == ExecutionStep.NONE) {
+                    game.setStep(ExecutionStep.ABILITY_1);
+                    return game.requestTargets(
+                        TargetCount.ONE,
+                        TargetType.UNIT,
+                        thisCard.controllerID,
+                        thisCard.cardUid,
+                        "Select target for ambush"
+                    );
+                }
+                if (game.getStep() == ExecutionStep.ABILITY_1) {
+                    let target = game.getTarget_SingleCardID();
+                    if (!target) return ReturnTrigger.NO_EFFECT;
+                    thisCard.ready = true;
+                    game.setStep(ExecutionStep.ABILITY_2);
+                    game.nonActionAttackCard(thisCard.controllerID, thisCard.cardID, target);
+                    return ReturnTrigger.UNFINISHED;
+                }
+                // if (game.getStep() == ExecutionStep.ABILITY_2) {
+                //     // If attack was invalid, we have him be unready
+                //     if (game.getChildOutput() == ReturnTrigger.CANCEL) {
+                //         thisCard.ready = false
+                //     }
+                // }
+                if (game.getStep() == ExecutionStep.ABILITY_2) {
+                    // Loop back version to allow new target to be selected
+                    if (game.getChildOutput() == ReturnTrigger.CANCEL) {
+                        thisCard.ready = false;
+                        game.setStep(ExecutionStep.NONE);
+                        return ReturnTrigger.UNFINISHED;
+                    }
+                }
             }
         }
     ],
@@ -266,8 +309,8 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                     power: thisCard.damage,
                     hp: 0,
                     duration: EffectDuraction.DAMAGE_CHANGES,
-                }
-                game.applyBuff(thisCard, buff)
+                };
+                game.applyBuff(thisCard, buff);
             }
         }
     ],
@@ -285,8 +328,8 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
                             keyword: Keyword.UNATTACKABLE,
                             number: 0
                         }
-                    }
-                    game.applyBuff(thisCard, buff)
+                    };
+                    game.applyBuff(thisCard, buff);
                 }
             }
         },
@@ -297,11 +340,42 @@ export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
                 let defenderID: CardID = data.defenderID;
                 if (defenderID == thisCard.cardID) {
-                    return ReturnTrigger.CANCEL // Cancel attack if attacking this unit
+                    return ReturnTrigger.CANCEL; // Cancel attack if attacking this unit
                 }
             }
         },
     ],
+    [Keyword.EXPLOIT]: [
+        {
+            trigger: Trigger.CALC_COST,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (thisCard.cardID != data.cardID) return ReturnTrigger.NO_EFFECT
+                if (game.getStep() == ExecutionStep.NONE) {
+                    game.setStep(ExecutionStep.ABILITY_1);
+                    return game.requestTargets(
+                        TargetCount.ANY,
+                        TargetType.UNIT,
+                        thisCard.controllerID,
+                        thisCard.cardUid,
+                        `Select up to ${number} targets for exploit`
+                    );
+                }
+                if (game.getStep() == ExecutionStep.ABILITY_1) {
+                    let targets = game.getTarget_CardList().filter((card: CardActive) => {
+                        return card.controllerID == thisCard.controllerID
+                    });
+                    if (targets.length == 0) return ReturnTrigger.NO_EFFECT;
+                    targets = targets.slice(0, number);
+                    targets.forEach((card: CardActive) => {
+                        game.defeatCard(card.cardID)
+                        data.amount -= 2
+                    })
+                    return ReturnTrigger.ENDED;
+                }
+            }
+        }
+    ]
+
 }
 
 export const CardIDKeywords: {[key in CardUID]: CardKeyword[]} = {
@@ -335,6 +409,9 @@ export const CardIDKeywords: {[key in CardUID]: CardKeyword[]} = {
     ["6930799884"]:  [ // A-Wing
         { keyword: Keyword.RAID, number: 1}
     ],
+    ["5243634234"]: [
+        { keyword: Keyword.EXPLOIT, number: 2}
+    ]
 }
 
 
@@ -524,7 +601,7 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
                 return ReturnTrigger.CANCEL
             }
         },
-    ]
+    ],
 }
 
 

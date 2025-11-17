@@ -5,10 +5,80 @@
         "0": {
             "playerID": "0",
             "base": {
+                "cardUid": "0109520913",
+                "aspect": "Aggression",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "5683908835",
+                    "aspects": [
+                        "Command",
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "5243634234",
+                "3680942691",
+                "9610332938",
+                "9283787549",
+                "3556557330",
+                "0874389236"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 3,
+                    "cardUid": "6814804824"
+                }
+            ],
+            "deck": [
+                "9353672706",
+                "9415708584",
+                "9831248752"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 1,
+                    "cardUid": "0874389236",
+                    "name": "Imperial Occupier",
+                    "hp": 2,
+                    "power": 2,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010132_EN_Imperial_Occupier_e658a446bf.png",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 8,
+            "resourcesRemaining": 8,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
                 "cardUid": "2376813177",
                 "aspect": "Cunning",
                 "hp": 30,
-                "damage": 10
+                "damage": 0
             },
             "leaders": [
                 {
@@ -23,115 +93,54 @@
                 }
             ],
             "hand": [
-                "0726963200",
+                "3469756679",
+                "3469756679",
+                "7298144465",
                 "6523135540",
-                "6930799884",
-                "2404240951",
-                "8613908567",
-                "1162729042"
-            ],
-            "resources": [
-                {
-                    "ownerID": "0",
-                    "cardID": 3,
-                    "cardUid": "7249575408"
-                }
-            ],
-            "deck": [
                 "7983965297",
-                "7742118411",
-                "6930799884"
-            ],
-            "groundArena": [
-                {
-                    "cardID": 1,
-                    "cardUid": "9394156877",
-                    "name": "Dhani Pilgrim",
-                    "hp": 3,
-                    "power": 1,
-                    "cost": 1,
-                    "aspectCost": [
-                        "Vigilance"
-                    ],
-                    "ownerID": "0",
-                    "damage": 0,
-                    "ready": true,
-                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010055_EN_Dhani_Pilgrim_69154b8875.png",
-                    "controllerID": "0",
-                    "buffs": [],
-                    "upgrades": [],
-                    "keywords": [],
-                    "arena": 0
-                }
-            ],
-            "spaceArena": [],
-            "discard": [],
-            "totalResources": 3,
-            "resourcesRemaining": 3,
-            "finished": false,
-            "cardsToResource": 0
-        },
-        "1": {
-            "playerID": "1",
-            "base": {
-                "cardUid": "0507674993",
-                "aspect": "Command",
-                "hp": 30,
-                "damage": 10
-            },
-            "leaders": [
-                {
-                    "cardUid": "6088773439",
-                    "aspects": [
-                        "Aggression",
-                        "Villainy"
-                    ],
-                    "ready": true,
-                    "epicActionAvailable": true,
-                    "deployed": false
-                }
-            ],
-            "hand": [
-                "3347454174",
-                "4100796757",
-                "7227136692",
-                "9127322562",
-                "4328408486",
-                "8746311599"
+                "5572220841"
             ],
             "resources": [
                 {
                     "ownerID": "1",
                     "cardID": 4,
-                    "cardUid": "7227136692"
+                    "cardUid": "6523135540"
                 }
             ],
             "deck": [
-                "9655836052",
-                "6867378216",
-                "8986035098",
-                "9655836052"
+                "5572220841",
+                "7249575408",
+                "7249575408",
+                "1162729042",
+                "0726963200",
+                "9394156877",
+                "8401089833"
             ],
             "groundArena": [
                 {
                     "cardID": 2,
-                    "cardUid": "2529211493",
-                    "name": "Imperial Dark Trooper",
+                    "cardUid": "7504035101",
+                    "name": "Loth-Wolf",
                     "hp": 3,
                     "power": 3,
                     "cost": 2,
                     "aspectCost": [
-                        "Command",
-                        "Villainy"
+                        "Vigilance",
+                        "Heroism"
                     ],
                     "ownerID": "1",
                     "damage": 0,
                     "ready": true,
-                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010080_EN_Imperial_Dark_Trooper_de4f5d0781.png",
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_05010044_EN_Loth_Wolf_278b8954fd.png",
                     "controllerID": "1",
                     "buffs": [],
                     "upgrades": [],
-                    "keywords": [],
+                    "keywords": [
+                        {
+                            "keyword": 2,
+                            "number": 0
+                        }
+                    ],
                     "arena": 0
                 }
             ],
@@ -144,12 +153,11 @@
         }
     },
     "name": "Cloud",
-    "initiative": "1",
-    "turn": "1",
+    "initiative": "0",
+    "turn": "0",
     "phase": 0,
     "initiativeClaimed": false,
     "subPhase": 0,
-    "targets": [],
     "heap": [],
     "stack": [],
     "targetInfo": {
@@ -157,9 +165,9 @@
         "player": "",
         "count": "ONE",
         "type": "UNIT",
-        "options": [],
         "targets": [],
-        "cardUid": "",
-        "text": ""
+        "options": [],
+        "text": "",
+        "cardUid": ""
     }
 }

@@ -69,6 +69,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010055_EN_Dhani_Pilgrim_69154b8875.png",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 0
                 }
@@ -147,6 +148,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_0201234_EN_Incinerator_Trooper_1c2dcd06b7.png",
                     "controllerID": "1",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 0
                 }
@@ -167,5 +169,15 @@
     "subPhase": 0,
     "targets": [],
     "heap": [],
-    "stack": []
+    "stack": [],
+    "targetInfo": {
+        "active": false,
+        "player": "",
+        "count": "ONE",
+        "type": "UNIT",
+        "options": [],
+        "targets": [],
+        "cardUid": "",
+        "text": ""
+    }
 }

@@ -86,6 +86,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010080_EN_Imperial_Dark_Trooper_de4f5d0781.png",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 0
                 }
@@ -108,6 +109,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_04010136_EN_Prototype_TIE_Advanced_0d010986dd.png",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 1
                 },
@@ -127,6 +129,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_04010243_EN_Quasar_TIE_Carrier_e98400d78c.png",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 1
                 },
@@ -146,6 +149,7 @@
                     "imgURL": "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F04010_T01_EN_TIE_Fighter_797390e528.png&w=1200&q=75",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 1
                 },
@@ -165,6 +169,7 @@
                     "imgURL": "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F04010_T01_EN_TIE_Fighter_797390e528.png&w=1200&q=75",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 1
                 }
@@ -267,6 +272,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_05010044_EN_Loth_Wolf_278b8954fd.png",
                     "controllerID": "1",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [
                         {
                             "keyword": 2,
@@ -293,6 +299,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010254_EN_Heroic_ARC_170_e26be11fe2.png",
                     "controllerID": "1",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 1
                 }
@@ -312,5 +319,15 @@
     "subPhase": 0,
     "targets": [],
     "heap": [],
-    "stack": []
+    "stack": [],
+    "targetInfo": {
+        "active": false,
+        "player": "",
+        "count": "ONE",
+        "type": "UNIT",
+        "options": [],
+        "targets": [],
+        "cardUid": "",
+        "text": ""
+    }
 }

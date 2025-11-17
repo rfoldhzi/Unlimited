@@ -6,40 +6,6 @@ import * as GameHandler from "../logic/gameHandler"
 
 describe('Cost Calculation Test', () => {
 
-    let card = {
-        data: {
-            data: {
-                attributes: {
-                    arenas: {
-                        data: [
-                            {
-                                attributes: {
-                                    name: "Ground"
-                                }
-                            }
-                        ]
-                    },
-                    aspects: {
-                        data: [
-
-                        ]
-                    },
-                    artFront: {
-                        data: {
-                            attributes: {
-                                formats: {
-                                    card: {
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     let getGame = () => {
         return new GameClass(JSON.parse(JSON.stringify(ATDPGame)));
     }
@@ -77,7 +43,8 @@ describe('Cost Calculation Test', () => {
                 power: 3,
                 ready: false,
                 buffs: [],
-                cardID: 0
+                cardID: 0,
+                upgrades: []
             }
             return card
         })

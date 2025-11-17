@@ -58,13 +58,14 @@ describe('Cancel Attack Test', () => {
                 damage: 0,
                 hp: 2,
                 imgURL: "https://cdn.starwarsunlimited.com//card_05010245_EN_Vulptex_4c37969f34.png",
-                keywords: [{ keyword: Keyword.HIDDEN, number: 0}],
+                keywords: [{ keyword: Keyword.HIDDEN, number: 0 }],
                 name: "Vulptex",
                 ownerID: "1",
                 power: 3,
                 ready: false,
                 buffs: [],
-                cardID: 0
+                cardID: 0,
+                upgrades: []
             }
             return card
         })

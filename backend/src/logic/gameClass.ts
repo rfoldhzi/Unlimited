@@ -1,4 +1,4 @@
-import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType } from "../models/game";
+import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType, TargetCount, TargetType } from "../models/game";
 import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, Trigger, Buff, BuffCardIDAbilities } from "./abilities";
 import { createCard, Token, TokenUnit } from "./gameHandler";
 
@@ -46,14 +46,14 @@ export class GameClass {
      * Get ExecutionStep of current StackItem
      * @returns ExecutionStep
      */
-    private getStep(): ExecutionStep {
+    public getStep(): ExecutionStep {
         return this.stack().step || ExecutionStep.NONE
     }
     /**
      * Set ExecutionStep of current StackItem
      * @param step ExecutionStep
      */
-    private setStep(step: ExecutionStep) {
+    public setStep(step: ExecutionStep) {
         this.stack().step = step
     }
     private handleReturn(returnValue: ReturnTrigger): boolean {
@@ -86,7 +86,7 @@ export class GameClass {
      * Get output from child stack item
      * @returns any formart
      */
-    private getChildOutput(): any {
+    public getChildOutput(): any {
         if (Array.isArray(this.data.stack[0])) {
             return this.data.stack[0][0]!.childOutput
         }
@@ -191,7 +191,7 @@ export class GameClass {
         return card
     }
 
-    public defeatCard(card: CardActive) {
+    public realDefeatCard(card: CardActive) {
         let player = this.players[card.controllerID]!
         let list: CardActive[]
         if (card.arena == Arena.GROUND) {
@@ -210,6 +210,13 @@ export class GameClass {
         }
     }
 
+    public defeatCard(cardID: CardID, killerID?: CardID) {
+        this.createStackFunction(StackFunctionType.DEFEAT, {
+            cardID: cardID,
+            killerID: killerID,
+        })
+    }
+
     private async stack_defeatCard() {
         let cardID: CardID = this.getInput().cardID
         let killerID: CardID | undefined = this.getInput().killerID
@@ -218,6 +225,7 @@ export class GameClass {
             this.setStep(ExecutionStep.CHECK_DEFEAT)
             this.setTriggerData({
                 cardID: cardID,
+                killerID: killerID,
             })
             this.triggerAbility(Trigger.CHECK_DEFEAT)
             return
@@ -238,7 +246,7 @@ export class GameClass {
         if (this.getStep() == ExecutionStep.DEFEAT) {
             let card = this.findUnitAnyPlayer(cardID)
             if (card)
-                this.defeatCard(card)
+                this.realDefeatCard(card)
             return this.releaseStack()
         }
     }
@@ -343,6 +351,20 @@ export class GameClass {
             playerID: playerID,
         })
         await this.runStack()
+    }
+
+    /**
+     * 
+     * @param playerID attacker player
+     * @param attackerID 
+     * @param defenderID 
+     */
+    public nonActionAttackCard(playerID: PlayerID, attackerID: CardID, defenderID: CardID) {
+        this.createStackFunction(StackFunctionType.ATTACK_UNIT, {
+            attackerID: attackerID,
+            defenderID: defenderID,
+            playerID: playerID,
+        })
     }
 
     public async stack_attackCard() {
@@ -626,7 +648,7 @@ export class GameClass {
                 ability = KeyWordAbilites[stack.input.abilityKey as Keyword][stack.input.abilityIndex]!
                 out = ability.effect(card, this, this.getParentTriggerData(), stack.input.number)
                 break;
-            case AbilityType.UPGRADE:
+            case AbilityType.BUFF:
                 ability = BuffCardIDAbilities[stack.input.abilityKey as CardUID]![stack.input.abilityIndex]!
                 out = ability.effect(card, this, this.getParentTriggerData())
                 break;
@@ -636,10 +658,13 @@ export class GameClass {
                 break;
         }
         console.log("CARD", card)
-        if (out == ReturnTrigger.CANCEL)
+        if (out == ReturnTrigger.CANCEL) {
             this.setTriggerReturn(out)
-        if (out == ReturnTrigger.ENDED) 
+            this.releaseStack()
+        } else if (out == ReturnTrigger.ENDED) 
             stack.ended = true;
+        else if (out == ReturnTrigger.UNFINISHED || out == ReturnTrigger.TARGET )
+            return out // Don't release stack yet
         else
             this.releaseStack()
         if (out == undefined) return ReturnTrigger.CONTINUE
@@ -686,7 +711,7 @@ export class GameClass {
     private async runStack() {
         while (this.data.stack.length > 0) {
             let out = await this.executeStackItem()
-            if (out == ReturnTrigger.STOP) return
+            if (out == ReturnTrigger.TARGET) return
         }
     }
 
@@ -1178,7 +1203,7 @@ export class GameClass {
                         if (ability.trigger == trigger) {
                             this.createAbilityStackFunction(StackFunctionType.ABILITY, {
                                 cardID: card.cardID,
-                                abilityType: AbilityType.UPGRADE,
+                                abilityType: AbilityType.BUFF,
                                 abilityKey: buff.abilityID,
                                 abilityIndex: index,
                             })
@@ -1244,13 +1269,62 @@ export class GameClass {
         })
     }
 
-    //TODO finish
-    public async targetAbility(minTargets: number, maxTargets: number) {
-        this.data.targetCount = {
-            min: minTargets,
-            max: maxTargets,
-        };
-        this.data.subPhase = SubPhase.TARGET;
+    /**
+     * 
+     * @param count 
+     * @param type 
+     * @param player 
+     * @param options 
+     */
+    public requestTargets(
+        count: TargetCount,
+        type: TargetType,
+        player: PlayerID,
+        cardUid: CardUID,
+        text?: string,
+        options?: string[]
+    ): ReturnTrigger.TARGET {
+        this.data.targetInfo.active = true;
+        this.data.targetInfo.player = player;
+        this.data.targetInfo.count = count;
+        this.data.targetInfo.type = type;
+        this.data.targetInfo.cardUid = cardUid;
+        if (text)
+            this.data.targetInfo.text = text;
+        if (options)
+            this.data.targetInfo.options = options;
+        this.data.targetInfo.targets = []
+        return ReturnTrigger.TARGET
+    }
+
+    public getTargets(): string[] {
+        return this.data.targetInfo.targets
+    }
+
+    public getTarget_SingleCardID(): CardID | false {
+        if (this.data.targetInfo.targets.length != 1) return false
+        if (isNaN(Number(this.data.targetInfo.targets[0]))) return false
+        return Number(this.data.targetInfo.targets[0])
+    }
+
+    public getTarget_CardList(): CardActive[] {
+        let targets: CardActive[] = []
+        this.data.targetInfo.targets.forEach((item: string) => {
+            let card = this.findUnitAnyPlayer(Number(item))
+            if (card) {
+                targets.push(card)
+            }
+        })
+        return targets
+    }
+
+    /**
+     * Player Step
+     */
+    public async setTargets(targets: string[]) {
+        this.data.targetInfo.targets = targets;
+        this.data.targetInfo.active = false;
+        await this.runStack()
     }
 
     public async postBaseDamage() {

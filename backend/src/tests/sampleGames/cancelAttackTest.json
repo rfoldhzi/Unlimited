@@ -72,6 +72,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_05010044_EN_Loth_Wolf_278b8954fd.png",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [
                         {
                             "keyword": 2,
@@ -96,6 +97,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_06010055_EN_Dhani_Pilgrim_69154b8875.png",
                     "controllerID": "0",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 0
                 }
@@ -179,6 +181,7 @@
                     "imgURL": "https://cdn.starwarsunlimited.com//card_I01010038_EN_Hoth_Trooper_dbbbff9f1e.png",
                     "controllerID": "1",
                     "buffs": [],
+                    "upgrades": [],
                     "keywords": [],
                     "arena": 0
                 }
@@ -199,5 +202,15 @@
     "subPhase": 0,
     "targets": [],
     "heap": [],
-    "stack": []
+    "stack": [],
+    "targetInfo": {
+        "active": false,
+        "player": "",
+        "count": "ONE",
+        "type": "UNIT",
+        "options": [],
+        "targets": [],
+        "cardUid": "",
+        "text": ""
+    }
 }
