@@ -18,7 +18,8 @@ export default function Base({ playerID, onSend, lastMessage, }: Props) {
   let [isOpen, setIsOpen] = useState(false)
   const { data, setValue } = useCardLookUp();
 
-  const { selectedCard, setCard } = useSelectedCard();
+   const { selected } = useSelectedCard();
+    const { selectedCard, setCard } = selected;
   let baseClicked = () => {
     if (selectedCard && playerID != PlayerName) { // make sure attacker selected and this is not your base
       setCard(undefined)

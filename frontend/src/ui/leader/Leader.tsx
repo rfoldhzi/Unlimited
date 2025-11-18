@@ -18,7 +18,8 @@ export default function Leader({ playerID, onSend, lastMessage, }: Props) {
   let [isOpen, setIsOpen] = useState(false)
   const { data, setValue } = useCardLookUp();
 
-  const { selectedCard, setCard } = useSelectedCard();
+  const { selected } = useSelectedCard();
+  const { selectedCard, setCard } = selected;
   let leaderClicked = () => {
     
   }

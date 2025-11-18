@@ -411,6 +411,12 @@ export const CardIDKeywords: {[key in CardUID]: CardKeyword[]} = {
     ],
     ["5243634234"]: [
         { keyword: Keyword.EXPLOIT, number: 2}
+    ],
+    ["3612941171"]: [ //Sandtrooper Calvary
+        { keyword: Keyword.GRIT, number: 0}
+    ],
+    ["2761325938"]: [ // devastating gunship
+        { keyword: Keyword.GRIT, number: 0}
     ]
 }
 
@@ -479,7 +485,7 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
             // heal base 1
             trigger: Trigger.DEFEAT,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                if (data.cardID != thisCard.cardID) return
+                if (data.cardID != thisCard.cardID) return ReturnTrigger.NO_EFFECT
                 game.players[thisCard.controllerID]!.base.damage -= 1;
                 if (game.players[thisCard.controllerID]!.base.damage < 0) {
                     game.players[thisCard.controllerID]!.base.damage = 0
@@ -491,7 +497,7 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
             // heal base 1
             trigger: Trigger.PLAY,
             effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
-                if (data.cardID != thisCard.cardID) return
+                if (data.cardID != thisCard.cardID) return ReturnTrigger.NO_EFFECT
                 game.players[thisCard.controllerID]!.base.damage -= 1;
                 if (game.players[thisCard.controllerID]!.base.damage < 0) {
                     game.players[thisCard.controllerID]!.base.damage = 0
@@ -602,6 +608,82 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
             }
         },
     ],
+    ["3469756679"]: [ // Heroic Arc-170
+        {
+            // When Played: if you control a damaged unit, you may deal 2 damage to an enemy unit
+            trigger: Trigger.PLAY,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (game.getStep() == ExecutionStep.NONE) {
+                    if (data.cardID != thisCard.cardID) return ReturnTrigger.NO_EFFECT
+                    
+                    //Find fiendly damaged unit
+                    let player = game.players[thisCard.controllerID]
+                    let damagedCard = null
+                    player?.groundArena.forEach((card: CardActive) => {
+                        if (card.damage > 0) damagedCard = card
+                    })
+                    player?.spaceArena.forEach((card: CardActive) => {
+                        if (card.damage > 0) damagedCard = card
+                    })
+                    if (damagedCard) {
+                        game.setStep(ExecutionStep.ABILITY_1);
+                        return game.requestTargets(
+                            TargetCount.ONE,
+                            TargetType.UNIT,
+                            thisCard.controllerID,
+                            thisCard.cardUid,
+                            "Select enemy unit for damage from ARC-170"
+                        );
+                    } else {
+                        return ReturnTrigger.NO_EFFECT
+                    }
+                }
+                if (game.getStep() == ExecutionStep.ABILITY_1) {
+                    let target = game.getTarget_SingleCardID();
+                    if (!target) return ReturnTrigger.NO_EFFECT;
+                    let enemy = game.findUnitAnyPlayer(target)
+                    if (enemy && enemy.controllerID != thisCard.controllerID) {
+                        game.dealDamage(thisCard.cardID, thisCard.cardID, target, 2)
+                        return ReturnTrigger.ENDED;
+                    } else {
+                        return ReturnTrigger.NO_EFFECT
+                    }
+                }
+            }
+        }
+    ],
+    ["2761325938"]: [ // devastating gunship
+        {
+            // When Played: Defeat ab enemy unit with 2 or less remaining HP
+            trigger: Trigger.PLAY,
+            effect: (thisCard: CardActive, game: GameClass, data?: any, number?: number) => {
+                if (game.getStep() == ExecutionStep.NONE) {
+                    if (data.cardID != thisCard.cardID) return ReturnTrigger.NO_EFFECT
+                    
+                    //Find fiendly damaged unit
+                    game.setStep(ExecutionStep.ABILITY_1);
+                    return game.requestTargets(
+                        TargetCount.ONE,
+                        TargetType.UNIT,
+                        thisCard.controllerID,
+                        thisCard.cardUid,
+                        "Select enemy unit with >2 remaining health to defeat from Gunship"
+                    );
+                }
+                if (game.getStep() == ExecutionStep.ABILITY_1) {
+                    let target = game.getTarget_SingleCardID();
+                    if (!target) return ReturnTrigger.NO_EFFECT;
+                    let enemy = game.findUnitAnyPlayer(target)
+                    if (enemy && enemy.controllerID != thisCard.controllerID && enemy.hp - enemy.damage <= 2) {
+                        game.defeatCard(target, thisCard.cardID)
+                        return ReturnTrigger.ENDED;
+                    } else {
+                        return ReturnTrigger.NO_EFFECT
+                    }
+                }
+            }
+        }
+    ]
 }
 
 

@@ -1,0 +1,90 @@
+.target-help-text {
+    position: absolute;
+    top: 0;
+    /* width: 100%; */
+    padding-left: 20px;
+    padding-right: 20px;
+    left: 50%;
+    z-index: 3;
+    background: #111;
+    transform: translateX(-50%);
+    border-radius: 0px 0px 20px 20px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    max-width: 80%;
+    width: auto;
+}
+
+.confirm-targets {
+  background-color: rgb(15, 175, 1);
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+}
+
+.targeter-card {
+    position: absolute;
+    z-index: 3;
+    background: #111;
+    padding: 8px;
+    border-radius: 10px;
+    /* width: 200px; */
+    /* height: 200px; */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.targeter-card-2 {
+  /* width: 60vmin; */
+  /* height: 50vmin; */
+  display: grid;
+  place-content: center;
+  color: white;
+  text-shadow: 0 1px 0 #000;
+  
+  --border-angle: 0turn; // For animation.
+  --main-bg: conic-gradient(
+      from var(--border-angle),
+      #213f,
+      #112f 5%,
+      #112f 60%,
+      #213f 95%
+    );
+  /* --main-bg: "#111"; */
+  
+  border: solid 5px transparent;
+  border-radius: 5px;
+  --gradient-border: conic-gradient(from var(--border-angle), transparent 25%, #08f, #f03 99%, transparent);
+  
+  background: 
+    // padding-box clip this background in to the overall element except the border.
+    var(--main-bg) padding-box,
+    // border-box extends this background to the border space
+    var(--gradient-border) border-box, 
+    // Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background.
+    var(--main-bg) border-box;
+  
+  background-position: center center;
+
+  animation: bg-spin 3s linear infinite;
+  @keyframes bg-spin {
+    to {
+      --border-angle: 1turn;
+    }
+  }
+
+  &:hover {
+    animation-play-state: paused;
+  }
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0turn;
+}

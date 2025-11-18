@@ -13,6 +13,7 @@ import Base from '../base/Base.tsx';
 import Opponent from '../opponent/Opponent.tsx';
 import "../home/Home.css"
 import Leader from '../leader/Leader.tsx';
+import Target from '../target/Target.tsx';
 
 const useWs = (useWebSocket as any).default as typeof useWebSocket
 
@@ -56,6 +57,7 @@ export default function Home() {
 
   return (
     <div>
+      <Target onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Target>
       <Opponent onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Opponent>
 
       <Hand onSend={handleClickSendMessage} lastMessage={lastMessage?.data}></Hand>

@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Image from "../../image/image.js"
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Arena.css"
-import type { CardActive, CardUID, CardStats } from '../../models/game.ts';
+import type { CardActive, CardUID, CardStats, Game } from '../../models/game.ts';
 import { PlayerName } from '../hand/Hand2.tsx';
 import Card from '../card/Card.tsx';
 import { useSelectedCard } from '../../context/selectedCard.tsx';
@@ -19,12 +19,25 @@ export default function Arena({ onSend, lastMessage }: Props) {
   useEffect(() => {
     
   });
+  let bigGame: Game
 
-  const { selectedCard, setCard } = useSelectedCard();
+  const { selected, targetCollection } = useSelectedCard();
+  const { selectedCard, setCard } = selected;
+  const { targets, toggleTarget, setTarget, clearTargets } = targetCollection;
+
+  console.log("targets1", targets)
 
   // const [selectedCard, selectCard ] = useState(null as CardActive | null);
 
+  let targeted = (card: CardActive): boolean => {
+    return !!targets.find((card2: CardActive) => card.cardID == card2.cardID)
+  }
+
   let friendselectedCard = (card: CardActive) => {
+    if (bigGame && bigGame.targetInfo.active && bigGame.targetInfo.player == PlayerName) {
+      toggleTarget(card)
+      return
+    }
     setCard(card)
   }
 
@@ -33,6 +46,12 @@ export default function Arena({ onSend, lastMessage }: Props) {
   }
 
   let enemyselectedCard = (card: CardActive) => {
+    console.log("a", card, bigGame, bigGame && bigGame.targetInfo.active && bigGame.targetInfo.player == PlayerName)
+    if (bigGame && bigGame.targetInfo.active && bigGame.targetInfo.player == PlayerName) {
+      toggleTarget(card)
+      console.log("AA")
+      return
+    }
     if (selectedCard) {
       console.log(selectedCard, "atttacks", card)
       console.log(`Attack Card:${PlayerName}:${selectedCard.cardID}:${card.cardID}`)
@@ -44,6 +63,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
 
   if (lastMessage && lastMessage.charAt(0) == "{") {
     let game = JSON.parse(lastMessage)
+    bigGame = game
     console.log("game2", game)
     return (
       <div>
@@ -56,7 +76,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
                 <div key={playerName} className='flex-center'>
                   {
                     game.players[playerName].groundArena.map((x: CardActive, j: number) => {
-                      return (<div className='b'>
+                      return (<div className={'b ' + (selectedCard?.cardID == x.cardID || targeted(x) ? 'selected' : '')}>
                         <Card key={x.cardID+"activeCard"+playerName+j} card={x} clickFunction={() => {enemyselectedCard(x)}}></Card>
                       </div>)
                     })
@@ -67,7 +87,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
           }
           <div className='flex-center'>
             {game.players[PlayerName].groundArena.map((x: CardActive, i: number) => {
-              return (<div className={'b '+ (selectedCard?.cardID == x.cardID ? 'selected': '')}>
+              return (<div className={'b ' + (selectedCard?.cardID == x.cardID || targeted(x) ? 'selected' : '')}>
                 <Card key={x.cardID+"activeCard"} card={x} clickFunction={() => {friendselectedCard(x)}}></Card>
               </div>)
             })}
@@ -82,7 +102,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
                 <div key={playerName} className='flex-center'>
                   {
                     game.players[playerName].spaceArena.map((x: CardActive, i: number) => {
-                      return (<div className='b'>
+                      return (<div className={'b ' + (selectedCard?.cardID == x.cardID || targeted(x) ? 'selected' : '')}>
                         <Card key={x.cardID+"activeCard"} card={x} clickFunction={() => {enemyselectedCard(x)}}></Card>
                       </div>)
                     })
@@ -93,7 +113,7 @@ export default function Arena({ onSend, lastMessage }: Props) {
           }
           <div className='flex-center'>
             {game.players[PlayerName].spaceArena.map((x: CardActive, i: number) => {
-              return (<div className={'b '+ (selectedCard?.cardID == x.cardID ? 'selected': '')}>
+              return (<div className={'b ' + (selectedCard?.cardID == x.cardID || targeted(x) ? 'selected' : '')}>
                 <Card key={x.cardID+"activeCard"} card={x} clickFunction={() => {friendselectedCard(x)}}></Card>
               </div>)
             })}

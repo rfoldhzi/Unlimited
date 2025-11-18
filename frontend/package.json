@@ -51,6 +51,7 @@
     "@types/react-flip-move": "^2.9.1",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
+    "sass": "^1.94.1",
     "tailwindcss": "^3.4.18"
   }
 }
