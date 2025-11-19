@@ -65,12 +65,19 @@ export interface CardStats extends CardBasic {
     keywords: CardKeyword[]
 }
 
-export interface CardActive extends CardStats {
+export interface Card extends CardStats {
+    // Changing things
+    ownerID: PlayerID,
+    controllerID: PlayerID,
+}
+
+export interface CardEvent extends Card {
+}
+
+export interface CardActive extends Card {
     // Changing things
     damage: number,
     ready: boolean,
-    ownerID: PlayerID,
-    controllerID: PlayerID,
     buffs: Buff[],
     upgrades: UpgradeActive[],
 }
@@ -156,7 +163,7 @@ export interface Game {
     subPhase: SubPhase;
     cardCount: number,
     winner?: PlayerID,
-    playedCard?: CardActive | undefined;
+    playedCard?: CardActive | CardEvent | undefined;
     heap: any[];
     stack: (StackItem | StackItem[])[];
     targetInfo: TargetInfo,

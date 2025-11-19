@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from 'react';
 import { useCardLookUp } from "../../context/cardLookUp.tsx";
 import "./Target.scss"
 import { PlayerName } from '../hand/Hand2.tsx';
-import { Phase, type CardActive, type Game, type PlayerID } from '../../models/game.ts';
+import { Phase, TargetType, type CardActive, type Game, type PlayerID } from '../../models/game.ts';
 import Card, { CardArea } from '../card/Card.tsx';
 import { useSelectedCard } from '../../context/selectedCard.tsx';
 
@@ -27,7 +27,10 @@ export default function Target({ onSend, lastMessage }: Props) {
     clearTargets()
   }
 
-
+  let confirmOption = (v: string) => {
+    onSend("Target:" + PlayerName + ":" + v)
+    clearTargets()
+  }
 
   if (lastMessage && lastMessage.charAt(0) == "{") {
     let game = JSON.parse(lastMessage) as Game
@@ -46,7 +49,15 @@ export default function Target({ onSend, lastMessage }: Props) {
           <div className='target-help-text'>
             {game.targetInfo.text}
             <br></br>
-            <button className="confirm-targets" onClick={confrim}>Confirm</button>
+            {
+              game.targetInfo.type == TargetType.OPTIONS ? (
+                game.targetInfo.options.map((v: string) => 
+                  <button className="confirm-targets" onClick={()=>{confirmOption(v)}}>{v}</button>
+                )
+              ) : (
+                <button className="confirm-targets" onClick={confrim}>Confirm</button>
+              )
+            }
           </div>
         </div> 
       )

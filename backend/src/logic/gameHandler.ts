@@ -1,4 +1,4 @@
-import { Arena, Aspect, Base, CardActive, CardUID, Game, games, Leader, Phase, PlayerState, SubPhase, TargetCount, TargetType } from "../models/game"
+import { Arena, Aspect, Base, CardActive, CardEvent, CardUID, Game, games, Leader, Phase, PlayerState, SubPhase, TargetCount, TargetType } from "../models/game"
 import { CardIDKeywords } from "./abilities";
 const https = require('https');
 
@@ -196,7 +196,7 @@ export const TokenUnit: {[key in Token]: CardActive} = {
         buffs: [],
         upgrades: [],
         keywords: [],
-        arena: Arena.SPACE,
+        arena: Arena.GROUND,
     },
     [Token.CLONE_TROOPER]: {
         cardID: 0,
@@ -214,17 +214,38 @@ export const TokenUnit: {[key in Token]: CardActive} = {
         buffs: [],
         upgrades: [],
         keywords: [],
-        arena: Arena.SPACE,
+        arena: Arena.GROUND,
     },
 }
 
-export async function createCard(cardUid: CardUID): Promise<CardActive | null> {
+export async function createCard(cardUid: CardUID): Promise<CardActive | CardEvent | null> {
     let data: any = await fetchCard(cardUid)
     data = data.data.data
     // console.log("data",data)
     if (data == null) {
         console.log("Data is null...?")
         return null
+    }
+    if (data.attributes.type.data.attributes.name == "Event") {
+        let card: CardEvent = {
+            cardID: 0,
+            cardUid: cardUid,
+            name: data.attributes.title,
+            hp: data.attributes.hp,
+            power: data.attributes.power,
+            cost: data.attributes.cost,
+            aspectCost: data.attributes.aspects.data.map((item: any) => item.attributes.name),
+            ownerID: "",
+            imgURL: data.attributes.artFront.data.attributes.formats.card.url,
+            controllerID: "0",
+            keywords: []
+        }
+        if (cardUid in CardIDKeywords) {
+            for (let cardKeyword of CardIDKeywords[cardUid]!) {
+                card.keywords.push(cardKeyword)
+            }
+        }
+        return card
     }
     let card: CardActive = {
         cardID: 0,

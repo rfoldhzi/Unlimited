@@ -1,0 +1,168 @@
+{
+    "gameID": 0,
+    "cardCount": 5,
+    "players": {
+        "0": {
+            "playerID": "0",
+            "base": {
+                "cardUid": "0109520913",
+                "aspect": "Aggression",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "5683908835",
+                    "aspects": [
+                        "Command",
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "8243760282",
+                "7979348081",
+                "7013591351",
+                "9415708584",
+                "5243634234",
+                "9283787549",
+                "3556557330"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 1,
+                    "cardUid": "3556557330"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 3,
+                    "cardUid": "3680942691"
+                }
+            ],
+            "deck": [
+                "9283787549",
+                "2267524398",
+                "9415708584",
+                "8201333805",
+                "9610332938",
+                "8201333805",
+                "9610332938",
+                "5243634234"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 5,
+                    "cardUid": "0874389236",
+                    "name": "Imperial Occupier",
+                    "hp": 2,
+                    "power": 2,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Aggression",
+                        "Villainy"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": false,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_06010132_EN_Imperial_Occupier_e658a446bf.png",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "upgrades": [],
+                    "keywords": [],
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 4,
+            "resourcesRemaining": 2,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
+                "cardUid": "0109520913",
+                "aspect": "Aggression",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "5683908835",
+                    "aspects": [
+                        "Command",
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "6814804824",
+                "3680942691",
+                "9283787549",
+                "7579458834",
+                "9353672706",
+                "2267524398",
+                "1192349217",
+                "9415708584"
+            ],
+            "resources": [
+                {
+                    "ownerID": "1",
+                    "cardID": 2,
+                    "cardUid": "7013591351"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 4,
+                    "cardUid": "8243760282"
+                }
+            ],
+            "deck": [
+                "7013591351",
+                "0249398533",
+                "8201333805",
+                "7579458834",
+                "8243760282",
+                "3556557330",
+                "9283787549",
+                "2554988743",
+                "2267524398",
+                "2554988743",
+                "5841647666"
+            ],
+            "groundArena": [],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 5,
+            "resourcesRemaining": 5,
+            "finished": false,
+            "cardsToResource": 0
+        }
+    },
+    "name": "Cloud",
+    "initiative": "0",
+    "turn": "1",
+    "phase": 0,
+    "initiativeClaimed": false,
+    "subPhase": 0,
+    "heap": [],
+    "stack": [],
+    "targetInfo": {
+        "active": false,
+        "player": "",
+        "count": "ONE",
+        "type": "UNIT",
+        "targets": [],
+        "options": [],
+        "text": "",
+        "cardUid": ""
+    }
+}

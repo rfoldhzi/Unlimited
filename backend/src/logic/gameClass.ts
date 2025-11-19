@@ -1,4 +1,4 @@
-import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType, TargetCount, TargetType } from "../models/game";
+import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType, TargetCount, TargetType, CardEvent, Card } from "../models/game";
 import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, Trigger, Buff, BuffCardIDAbilities } from "./abilities";
 import { createCard, Token, TokenUnit } from "./gameHandler";
 
@@ -161,7 +161,7 @@ export class GameClass {
      */
     public findUnitAnyPlayer(cardID: CardID): CardActive | undefined {
         let card: CardActive | undefined
-        if (this.data.playedCard?.cardID == cardID) return this.data.playedCard
+        if (this.data.playedCard?.cardID == cardID && "ready" in this.data.playedCard) return this.data.playedCard
         for (let playerID in this.players) {
             let player = this.players[playerID]!
             for (let c of player.groundArena) {
@@ -636,11 +636,16 @@ export class GameClass {
     }
 
     private executeAbility(stack: StackItem): ReturnTrigger {
-        let card = this.findUnitAnyPlayer(stack.input.cardID)
+        let card: Card | undefined = this.findUnitAnyPlayer(stack.input.cardID)
         if (card == null) {
-            this.releaseStack()
-            return ReturnTrigger.CONTINUE
+            if (this.data.playedCard?.cardID == stack.input.cardID) 
+                card = this.data.playedCard!
+            else {
+                this.releaseStack()
+                return ReturnTrigger.CONTINUE
+            }
         }
+        // card = card!
         let ability: Ability
         let out: ReturnTrigger | void = undefined
         switch (stack.input.abilityType) {
@@ -863,7 +868,8 @@ export class GameClass {
 
             card.ownerID = playerId;
             card.controllerID = playerId;
-            card.ready = false;
+            if ("ready" in card)
+                card.ready = false;
 
             this.data.cardCount += 1;
             card.cardID = this.data.cardCount;
@@ -913,11 +919,11 @@ export class GameClass {
             // player.groundArena.push(card)
             if (this.heap().card.arena == Arena.GROUND) {
                 player.groundArena.push(this.heap().card)
+                this.data.playedCard = undefined
             } else if (this.heap().card.arena == Arena.SPACE) {
                 player.spaceArena.push(this.heap().card)
+                this.data.playedCard = undefined
             }
-
-            this.data.playedCard = undefined
 
             this.setStep(ExecutionStep.POST_PLAY)
             this.setTriggerData({
@@ -927,6 +933,7 @@ export class GameClass {
             return
         }
         if (this.getStep() == ExecutionStep.POST_PLAY) {
+            this.data.playedCard = undefined
             return this.releaseStack() // Must be last step
         }
     }
@@ -1173,10 +1180,26 @@ export class GameClass {
 
     public triggerAbility(trigger: Trigger): ReturnTrigger {
         let cards = this.getEveryUnit();
-        if (this.data.playedCard) {
+        if (this.data.playedCard && "ready" in this.data.playedCard) {
             cards.push(this.data.playedCard)
         }
         this.data.stack.unshift([]) // New Stack Item list of all triggered abilities
+        if (trigger == Trigger.PLAY && this.data.playedCard) {
+            if (CardIDAbilities[this.data.playedCard.cardUid]) {
+                for (let index in CardIDAbilities[this.data.playedCard.cardUid]!) {
+                    let ability = CardIDAbilities[this.data.playedCard.cardUid]![index]!
+                    if (ability.trigger == trigger) {
+                        this.createAbilityStackFunction(StackFunctionType.ABILITY, {
+                            cardID: this.data.playedCard.cardID,
+                            abilityType: AbilityType.CARD,
+                            abilityKey: this.data.playedCard.cardUid,
+                            abilityIndex: index,
+                        })
+                    }
+                }
+            }
+        }
+
         for (let card of cards) {
             // Trigger keyword abilities
             for (let keyword of card.keywords) {
@@ -1295,6 +1318,11 @@ export class GameClass {
             this.data.targetInfo.options = options;
         this.data.targetInfo.targets = []
         return ReturnTrigger.TARGET
+    }
+
+    public getTarget_Option(): string {
+        if (this.data.targetInfo.targets.length != 1) return ""
+        return this.data.targetInfo.targets[0]!
     }
 
     public getTargets(): string[] {
