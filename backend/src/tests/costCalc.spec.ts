@@ -1,7 +1,7 @@
 // import { beforeEach, describe } from "node:test";
 import { GameClass } from "../logic/gameClass";
 import * as ATDPGame from "./sampleGames/costCalcTest.json"
-import { Aspect, CardActive, Game } from "../models/game";
+import { Aspect, CardActive, CardType, Game } from "../models/game";
 import * as GameHandler from "../logic/gameHandler"
 
 describe('Cost Calculation Test', () => {
@@ -44,7 +44,9 @@ describe('Cost Calculation Test', () => {
                 ready: false,
                 buffs: [],
                 cardID: 0,
-                upgrades: []
+                upgrades: [],
+                traits: [],
+                cardType: CardType.UNIT
             }
             return card
         })

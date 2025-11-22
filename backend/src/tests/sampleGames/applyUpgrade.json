@@ -1,0 +1,233 @@
+{
+    "gameID": 0,
+    "cardCount": 7,
+    "players": {
+        "0": {
+            "playerID": "0",
+            "base": {
+                "cardUid": "3488958204",
+                "aspect": "Vigilance",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "4637578649",
+                    "aspects": [
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "2508430135",
+                "3612941171",
+                "6782724617",
+                "4944397020",
+                "7248761207",
+                "9566815036"
+            ],
+            "resources": [
+                {
+                    "ownerID": "0",
+                    "cardID": 2,
+                    "cardUid": "8645125292"
+                },
+                {
+                    "ownerID": "0",
+                    "cardID": 6,
+                    "cardUid": "3092212109"
+                }
+            ],
+            "deck": [
+                "3092212109",
+                "8679831560",
+                "6782724617",
+                "0125827362",
+                "0125827362",
+                "3182035434",
+                "6928341517",
+                "0126487527",
+                "5412384703"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 5,
+                    "cardUid": "4511413808",
+                    "name": "Follower of The Way",
+                    "hp": 3,
+                    "power": 1,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Vigilance"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_0201056_EN_Follower_of_The_Way_0187affd88.png",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "upgrades": [],
+                    "keywords": [],
+                    "traits": [
+                        "Mandalorian"
+                    ],
+                    "cardType": "Unit",
+                    "upgradePower": 0,
+                    "upgradeHp": 0,
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [
+                {
+                    "cardID": 1,
+                    "cardUid": "4718895864",
+                    "name": "Padawan Starfighter",
+                    "hp": 3,
+                    "power": 1,
+                    "cost": 2,
+                    "aspectCost": [
+                        "Vigilance"
+                    ],
+                    "ownerID": "0",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_0301058_EN_Padawan_Starfighter_b52f316cc9.png",
+                    "controllerID": "0",
+                    "buffs": [],
+                    "upgrades": [],
+                    "keywords": [],
+                    "traits": [
+                        "Jedi",
+                        "Republic",
+                        "Vehicle",
+                        "Fighter"
+                    ],
+                    "cardType": "Unit",
+                    "upgradePower": 0,
+                    "upgradeHp": 0,
+                    "arena": 1
+                }
+            ],
+            "discard": [],
+            "totalResources": 4,
+            "resourcesRemaining": 4,
+            "finished": false,
+            "cardsToResource": 0
+        },
+        "1": {
+            "playerID": "1",
+            "base": {
+                "cardUid": "3488958204",
+                "aspect": "Vigilance",
+                "hp": 30,
+                "damage": 0
+            },
+            "leaders": [
+                {
+                    "cardUid": "4637578649",
+                    "aspects": [
+                        "Villainy"
+                    ],
+                    "ready": true,
+                    "epicActionAvailable": true,
+                    "deployed": false
+                }
+            ],
+            "hand": [
+                "3092212109",
+                "8645125292",
+                "2761325938",
+                "9566815036",
+                "5412384703",
+                "0126487527",
+                "3612941171"
+            ],
+            "resources": [
+                {
+                    "ownerID": "1",
+                    "cardID": 3,
+                    "cardUid": "6782724617"
+                },
+                {
+                    "ownerID": "1",
+                    "cardID": 7,
+                    "cardUid": "3182035434"
+                }
+            ],
+            "deck": [
+                "8613908567",
+                "3612941171",
+                "0644276722",
+                "4825308717",
+                "3612941171",
+                "2508430135",
+                "6928341517",
+                "4718895864",
+                "4718895864",
+                "0126487527",
+                "7248761207",
+                "6928341517",
+                "6782724617",
+                "4944397020",
+                "4511413808",
+                "3182035434"
+            ],
+            "groundArena": [
+                {
+                    "cardID": 4,
+                    "cardUid": "0126487527",
+                    "name": "Axe Woves",
+                    "hp": 2,
+                    "power": 2,
+                    "cost": 3,
+                    "aspectCost": [
+                        "Vigilance"
+                    ],
+                    "ownerID": "1",
+                    "damage": 0,
+                    "ready": true,
+                    "imgURL": "https://cdn.starwarsunlimited.com//card_05010062_EN_Axe_Woves_01512860ce.png",
+                    "controllerID": "1",
+                    "buffs": [],
+                    "upgrades": [],
+                    "keywords": [],
+                    "traits": [
+                        "Mandalorian",
+                        "Trooper"
+                    ],
+                    "cardType": "Unit",
+                    "upgradePower": 0,
+                    "upgradeHp": 0,
+                    "arena": 0
+                }
+            ],
+            "spaceArena": [],
+            "discard": [],
+            "totalResources": 4,
+            "resourcesRemaining": 4,
+            "finished": false,
+            "cardsToResource": 0
+        }
+    },
+    "name": "Cloud",
+    "initiative": "1",
+    "turn": "1",
+    "phase": 0,
+    "initiativeClaimed": false,
+    "subPhase": 0,
+    "heap": [],
+    "stack": [],
+    "targetInfo": {
+        "active": false,
+        "player": "",
+        "count": "ONE",
+        "type": "UNIT",
+        "targets": [],
+        "options": [],
+        "text": "",
+        "cardUid": ""
+    }
+}

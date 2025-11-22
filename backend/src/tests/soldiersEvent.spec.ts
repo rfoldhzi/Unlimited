@@ -1,7 +1,7 @@
 // import { beforeEach, describe } from "node:test";
 import { GameClass } from "../logic/gameClass";
 import * as game from "./sampleGames/soldiersEvent.json"
-import { Aspect, CardActive, CardEvent, Game } from "../models/game";
+import { Aspect, CardActive, CardEvent, CardType, Game } from "../models/game";
 import * as GameHandler from "../logic/gameHandler"
 import { Keyword } from "../logic/abilities";
 
@@ -33,7 +33,11 @@ describe('Manuafractured Soldiers Event Test', () => {
                 ownerID: "0",
                 cardID: 0,
                 hp: 0,
-                power: 0
+                power: 0,
+                traits: [],
+                cardType: CardType.UNIT,
+                upgradePower: 0,
+                upgradeHp: 0
             }
             return card
         })

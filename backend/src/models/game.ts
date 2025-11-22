@@ -54,15 +54,27 @@ export interface CardResource extends CardBasic {
     ownerID: PlayerID,
 }
 
+export enum CardType {
+    UNIT = "Unit",
+    UPGRADE = "Upgrade",
+    EVENT = "Event",
+    TOKEN_UNIT = "Token Unit",
+    TOKEN_UPGRADE = "Token Upgrade",
+}
+
 export interface CardStats extends CardBasic {
     name: string,
     hp: number,
     power: number,
     cost: number,
+    upgradePower: number,
+    upgradeHp: number,
     aspectCost: Aspect[],
     imgURL?: string,
     arena?: Arena,
-    keywords: CardKeyword[]
+    keywords: CardKeyword[],
+    traits: String[],
+    cardType: CardType,
 }
 
 export interface Card extends CardStats {
@@ -74,16 +86,16 @@ export interface Card extends CardStats {
 export interface CardEvent extends Card {
 }
 
+export interface CardUpgrade extends Card {
+    parentCardID: CardID,
+}
+
 export interface CardActive extends Card {
     // Changing things
     damage: number,
     ready: boolean,
     buffs: Buff[],
-    upgrades: UpgradeActive[],
-}
-
-export interface UpgradeActive extends CardStats {
-    parentCardID: CardID,
+    upgrades: CardUpgrade[],
 }
 
 export interface PlayerState {

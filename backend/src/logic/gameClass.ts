@@ -1,4 +1,4 @@
-import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType, TargetCount, TargetType, CardEvent, Card } from "../models/game";
+import { Game, PlayerState, CardUID, PlayerID, Arena, CardID, CardActive, Phase, CardResource, Leader, Aspect, SubPhase, StackItem, StackFunctionType, TargetCount, TargetType, CardEvent, Card, CardType, CardUpgrade } from "../models/game";
 import { Ability, AbilityType, CardIDAbilities, CardIDKeywords, CardKeyword, EffectDuraction, ExecutionStep, Keyword, KeyWordAbilites, ReturnTrigger, Trigger, Buff, BuffCardIDAbilities } from "./abilities";
 import { createCard, Token, TokenUnit } from "./gameHandler";
 
@@ -288,6 +288,7 @@ export class GameClass {
             this.setStep(ExecutionStep.ATTACKER_DEAL_DAMAGE)
             this.setTriggerData({
                 dealerID: dealerID,
+                victimID: attackerID == dealerID ? defenderID : attackerID,
                 attackerID: attackerID,
                 defenderID: defenderID,
                 amount: amount
@@ -447,6 +448,7 @@ export class GameClass {
             this.setStep(ExecutionStep.ATTACKER_DEAL_DAMAGE)
             this.setTriggerData({
                 dealerID: attackerID,
+                victimID: defenderID,
                 attackerID: attackerID,
                 defenderID: defenderID,
                 amount: attacker.power
@@ -476,6 +478,7 @@ export class GameClass {
             this.setStep(ExecutionStep.DEFENDER_DEAL_DAMAGE)
             this.setTriggerData({
                 dealerID: defenderID,
+                victimID: attackerID,
                 attackerID: attackerID,
                 defenderID: defenderID,
                 amount: defender.power
@@ -684,8 +687,7 @@ export class GameClass {
         }
         switch (this.stack().function) {
             case StackFunctionType.PLAY_CARD:
-                await this.stack_playCard()
-                break;
+                return (await this.stack_playCard()) || ReturnTrigger.CONTINUE;
             case StackFunctionType.CREATE_TOKEN:
                 await this.stack_createTokenUnit()
                 break;
@@ -845,7 +847,7 @@ export class GameClass {
      * cardUid: CardUID
      * playerId: PlayerID
      */
-    private async stack_playCard() {
+    private async stack_playCard(): Promise<void | ReturnTrigger> {
         let cardUid: CardUID = this.getInput().cardUid
         let playerId: PlayerID = this.getInput().playerId
 
@@ -916,6 +918,17 @@ export class GameClass {
 
             player.resourcesRemaining -= result.cost
 
+            if (this.heap().card.cardType == CardType.UPGRADE) {
+                this.setStep(ExecutionStep.UPGRADE_TARGET_SELECTED)
+                return this.requestTargets(
+                    TargetCount.ONE,
+                    TargetType.UNIT,
+                    playerId,
+                    this.heap().card.cardUid,
+                    "Select a card to upgrade"
+                );
+            }
+
             // player.groundArena.push(card)
             if (this.heap().card.arena == Arena.GROUND) {
                 player.groundArena.push(this.heap().card)
@@ -932,9 +945,33 @@ export class GameClass {
             this.triggerAbility(Trigger.PLAY)
             return
         }
+        
+        if (this.getStep() == ExecutionStep.UPGRADE_TARGET_SELECTED) {
+            let target = this.getTarget_SingleCardID();
+            if (!target) return this.releaseStack(); // I don't what to do if target invalid
+            let targetCard = this.findUnitAnyPlayer(target)
+            if (!targetCard) return this.releaseStack(); // I don't what to do if target invalid
+            this.applyUpgrade(targetCard, this.heap().card)
+
+
+        
+
+            this.setStep(ExecutionStep.POST_PLAY)
+            this.setTriggerData({
+                cardID: (this.heap().card as CardActive).cardID,
+            })
+            this.triggerAbility(Trigger.PLAY)
+
+            return
+        }
         if (this.getStep() == ExecutionStep.POST_PLAY) {
             this.data.playedCard = undefined
-            return this.releaseStack() // Must be last step
+
+            this.endStack()
+
+            this.buffRemoval(EffectDuraction.CARD_ENTER_LEAVE)
+            this.triggerAbility(Trigger.CARD_ENTER_LEAVE)
+            return
         }
     }
 
@@ -1164,6 +1201,25 @@ export class GameClass {
         
     }
 
+    public applyUpgrade(card: CardActive, upgrade: CardUpgrade) {
+        card.upgrades.push(upgrade);
+        card.power += upgrade.upgradePower;
+        card.hp += upgrade.upgradeHp;
+        upgrade.parentCardID = card.cardID
+    }
+
+    public removeUpgrade(upgrade: CardUpgrade) {
+        let card = this.findUnitAnyPlayer(upgrade.parentCardID)
+        if (!card) return
+        let index = card.upgrades.indexOf(upgrade)
+        if (index != -1) {
+            card.upgrades.splice(index, 1)
+        } else {
+            return
+        }
+        this.buffRemoval(EffectDuraction.UPGRADE, upgrade.cardID)
+    }
+
     public getEveryUnit(): CardActive[] {
         let unitList: CardActive[] = []
         for (let playerID in this.players) {
@@ -1276,13 +1332,17 @@ export class GameClass {
         return ReturnTrigger.CONTINUE
     }
 
-    public buffRemoval(duration: EffectDuraction) {
+    public buffRemoval(duration: EffectDuraction, creatorID?: CardID) {
         let cards = this.getEveryUnit();
         cards.forEach((card: CardActive) => {
             let i = card.buffs.length - 1
             while (i >= 0) {
                 let buff = card.buffs[i]
                 if (buff?.duration == duration) {
+                    if (creatorID && creatorID != buff.creatorID) {
+                        i--;
+                        continue
+                    }
                     card.buffs.splice(i, 1)
                     card.power -= buff.power
                     card.hp -= buff.hp

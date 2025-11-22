@@ -1,4 +1,4 @@
-import { Arena, Base, Card, CardActive, CardID, CardUID, Game, PlayerID, PlayerState, TargetCount, TargetType } from "../models/game";
+import { Arena, Base, Card, CardActive, CardID, CardUID, CardUpgrade, Game, PlayerID, PlayerState, TargetCount, TargetType } from "../models/game";
 import { GameClass } from "./gameClass";
 import { Token } from "./gameHandler";
 
@@ -32,6 +32,7 @@ export enum ReturnTrigger {
 export enum ExecutionStep {
     NONE = "NONE",
     CALC_COST = "CALC_COST",
+    UPGRADE_TARGET_SELECTED = "UPGRADE_TARGET_SELECTED",
     POST_PLAY = "POST_PLAY",
     CHECK_ATTACK = "CHECK_ATTACK",
     ATTACK = "ATTACK",
@@ -114,6 +115,9 @@ export enum Trigger {
      *  Update data.amount if data changes
     */
     CALC_COST,
+    /**
+     * Buff Status Trigger
+     */
     CARD_ENTER_LEAVE,
     /** Before maybe defeat takes place
      * 
@@ -128,6 +132,7 @@ export enum EffectDuraction {
     CARD_ENTER_LEAVE,
     DAMAGE_CHANGES,
     UPGRADE,
+    SPECIFIC_CARD_LEAVE,
     NEVER
 }
 
@@ -164,6 +169,7 @@ export interface Buff {
     duration: EffectDuraction,
     abilityID?: CardUID,
     keyword?: CardKeyword,
+    creatorID?: CardID,
 }
 
 export const KeyWordAbilites: {[key in Keyword]: Ability[]} = {
@@ -409,14 +415,27 @@ export const CardIDKeywords: {[key in CardUID]: CardKeyword[]} = {
     ["6930799884"]:  [ // A-Wing
         { keyword: Keyword.RAID, number: 1}
     ],
-    ["5243634234"]: [
-        { keyword: Keyword.EXPLOIT, number: 2}
+    ["5243634234"]: [ // Baktoid Spider Droid
+        { keyword: Keyword.EXPLOIT, number: 2 },
+        { keyword: Keyword.AMBUSH, number: 0 }
     ],
     ["3612941171"]: [ //Sandtrooper Calvary
         { keyword: Keyword.GRIT, number: 0}
     ],
     ["2761325938"]: [ // devastating gunship
         { keyword: Keyword.GRIT, number: 0}
+    ],
+    ["9283787549"]: [ // Separatist Super Tank
+        { keyword: Keyword.EXPLOIT, number: 3 }
+    ],
+    ["2554988743"]: [ // Gor
+        { keyword: Keyword.EXPLOIT, number: 3 },
+        { keyword: Keyword.SENTINAL, number: 0 },
+        { keyword: Keyword.AMBUSH, number: 0 },
+        { keyword: Keyword.OVERWHELM, number: 0 },
+    ],
+    ["0249398533"]: [ // Obedient Vanguard
+        { keyword: Keyword.RAID, number: 1 }
     ]
 }
 
@@ -712,6 +731,91 @@ export const CardIDAbilities: {[key in CardUID]: Ability[]} = {
                     }
                     return ReturnTrigger.ENDED;
                 }
+            }
+        }
+    ],
+    ["6814804824"]: [ // I Am the Senate
+        {  // create 5 spies
+            trigger: Trigger.PLAY,
+            effect: (thisCard: Card, game: GameClass, data?: any, number?: number) => {
+                if (data.cardID != thisCard.cardID) return ReturnTrigger.NO_EFFECT
+                game.createTokenUnit(thisCard.controllerID, Token.SPY)
+                game.createTokenUnit(thisCard.controllerID, Token.SPY)
+                game.createTokenUnit(thisCard.controllerID, Token.SPY)
+                game.createTokenUnit(thisCard.controllerID, Token.SPY)
+                game.createTokenUnit(thisCard.controllerID, Token.SPY)
+                return ReturnTrigger.ENDED;
+            }
+        }
+    ],
+    ["0249398533"]: [ // Obedient Vanguard
+        // TODO implement trait then implement this
+    ],
+    ["5345999887"]: [ // Kjimi Patrollers
+        {   //Create tie fighter on play
+            trigger: Trigger.PLAY,
+            effect: (thisCard: Card, game: GameClass, data?: any, number?: number) => {
+                if (data.cardID != thisCard.cardID) return ReturnTrigger.NO_EFFECT
+                game.createTokenUnit(thisCard.controllerID, Token.TIE_FIGHTER)
+                return ReturnTrigger.ENDED;
+            }
+        }
+    ],
+    ["8679831560"]: [ // Repair
+        // TODO HEAL damage
+    ],
+    ["1323728003"]: [ //ElectroStaff
+        {   // While parent is defending, the attacker gets -1/-0
+            trigger: Trigger.UNIT_ATTACK,
+            effect: (thisCard: Card, game: GameClass, data?: any, number?: number) => {
+                let attackerID: CardID = data.attackerID;
+                let defenderID: CardID = data.defenderID;
+                if (defenderID != (thisCard as CardUpgrade).parentCardID) return;
+
+                let buff: Buff = {
+                    power: -1,
+                    hp: 0,
+                    duration: EffectDuraction.END_OF_ATTACK,
+                };
+                let attacker = game.findUnitAnyPlayer(attackerID)
+                if (attacker)
+                    game.applyBuff(attacker, buff);
+            }
+        }
+    ],
+    ["9566815036"]: [ // Darth Revan's Lightsabers
+        {   // If attached unit is a sith, it gains grit
+            trigger: Trigger.CARD_ENTER_LEAVE,
+            effect: (thisCard: Card, game: GameClass, data?: any, number?: number) => {
+                let parentID: CardID = (thisCard as CardUpgrade).parentCardID;
+                let parent = game.findUnitAnyPlayer(parentID)
+                if (parent) {
+                    if (parent.traits.includes("Sith")) {
+                        let buff: Buff = {
+                            power: 0,
+                            hp: 0,
+                            keyword: {
+                                keyword: Keyword.GRIT,
+                                number: 0
+                            },
+                            duration: EffectDuraction.CARD_ENTER_LEAVE,
+                        };
+                        game.applyBuff(parent, buff);
+                    }
+                }
+            }
+        }
+    ],
+    ["0126487527"]: [ // Axe Wolves (Mandolorian)
+        {   // +1/+1 for each upgrade
+            trigger: Trigger.CARD_ENTER_LEAVE,
+            effect: (thisCard: Card, game: GameClass, data?: any, number?: number) => {
+                let buff: Buff = {
+                    power: (thisCard as CardActive).upgrades.length,
+                    hp: (thisCard as CardActive).upgrades.length,
+                    duration: EffectDuraction.CARD_ENTER_LEAVE,
+                };
+                game.applyBuff((thisCard as CardActive), buff);
             }
         }
     ]

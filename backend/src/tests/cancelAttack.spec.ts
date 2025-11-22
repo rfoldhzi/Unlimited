@@ -1,7 +1,7 @@
 // import { beforeEach, describe } from "node:test";
 import { GameClass } from "../logic/gameClass";
 import * as SentinelGame from "./sampleGames/cancelAttackTest.json"
-import { Aspect, CardActive, Game } from "../models/game";
+import { Aspect, CardActive, CardType, Game } from "../models/game";
 import * as GameHandler from "../logic/gameHandler"
 import { Keyword } from "../logic/abilities";
 
@@ -65,7 +65,9 @@ describe('Cancel Attack Test', () => {
                 ready: false,
                 buffs: [],
                 cardID: 0,
-                upgrades: []
+                upgrades: [],
+                traits: [],
+                cardType: CardType.UNIT
             }
             return card
         })

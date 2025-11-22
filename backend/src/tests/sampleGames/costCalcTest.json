@@ -132,7 +132,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 19,
@@ -153,7 +157,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 21,
@@ -173,7 +181,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 23,
@@ -193,7 +205,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 }
             ],
             "spaceArena": [],
@@ -331,7 +347,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 20,
@@ -351,7 +371,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 22,
@@ -371,7 +395,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 24,
@@ -396,7 +424,11 @@
                             "number": 0
                         }
                     ],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 }
             ],
             "spaceArena": [],

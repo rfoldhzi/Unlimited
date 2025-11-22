@@ -88,7 +88,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 }
             ],
             "spaceArena": [
@@ -111,7 +115,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 1
+                    "arena": 1,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 13,
@@ -131,7 +139,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 1
+                    "arena": 1,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 16,
@@ -151,7 +163,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 1
+                    "arena": 1,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 },
                 {
                     "cardID": 20,
@@ -171,7 +187,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 1
+                    "arena": 1,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 }
             ],
             "discard": [],
@@ -279,7 +299,11 @@
                             "number": 0
                         }
                     ],
-                    "arena": 0
+                    "arena": 0,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 }
             ],
             "spaceArena": [
@@ -301,7 +325,11 @@
                     "buffs": [],
                     "upgrades": [],
                     "keywords": [],
-                    "arena": 1
+                    "arena": 1,
+                    "traits": [],
+                    "cardType": "Unit",
+                    "upgradeHp": 0,
+                    "upgradePower": 0
                 }
             ],
             "discard": [],

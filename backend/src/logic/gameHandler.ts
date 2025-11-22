@@ -1,5 +1,5 @@
-import { Arena, Aspect, Base, CardActive, CardEvent, CardUID, Game, games, Leader, Phase, PlayerState, SubPhase, TargetCount, TargetType } from "../models/game"
-import { CardIDKeywords } from "./abilities";
+import { Arena, Aspect, Base, CardActive, CardEvent, CardType, CardUID, Game, games, Leader, Phase, PlayerState, SubPhase, TargetCount, TargetType } from "../models/game"
+import { CardIDKeywords, Keyword } from "./abilities";
 const https = require('https');
 
 let deckCodes = [
@@ -141,6 +141,7 @@ export enum Token {
     X_WING = "X-WING",
     BATTLE_DROID = "BATTLE DROID",
     CLONE_TROOPER = "CLONE TROOPER",
+    SPY = "SPY",
 }
 
 export const TokenUnit: {[key in Token]: CardActive} = {
@@ -161,6 +162,10 @@ export const TokenUnit: {[key in Token]: CardActive} = {
         upgrades: [],
         keywords: [],
         arena: Arena.SPACE,
+        traits: ["Vehicle", "Fighter"],
+        cardType: CardType.TOKEN_UNIT,
+        upgradePower: 0,
+        upgradeHp: 0,
     },
     [Token.X_WING]: {
         cardID: 0,
@@ -179,6 +184,10 @@ export const TokenUnit: {[key in Token]: CardActive} = {
         upgrades: [],
         keywords: [],
         arena: Arena.SPACE,
+        traits: ["Vehicle", "Fighter"],
+        cardType: CardType.TOKEN_UNIT,
+        upgradePower: 0,
+        upgradeHp: 0,
     },
     [Token.BATTLE_DROID]: {
         cardID: 0,
@@ -197,6 +206,10 @@ export const TokenUnit: {[key in Token]: CardActive} = {
         upgrades: [],
         keywords: [],
         arena: Arena.GROUND,
+        traits: ["Separatist", "Droid", "Trooper"],
+        cardType: CardType.TOKEN_UNIT,
+        upgradePower: 0,
+        upgradeHp: 0,
     },
     [Token.CLONE_TROOPER]: {
         cardID: 0,
@@ -215,6 +228,37 @@ export const TokenUnit: {[key in Token]: CardActive} = {
         upgrades: [],
         keywords: [],
         arena: Arena.GROUND,
+        traits: ["Republic", "Clone", "Trooper"],
+        cardType: CardType.TOKEN_UNIT,
+        upgradePower: 0,
+        upgradeHp: 0,
+    },
+    [Token.SPY]: {
+        cardID: 0,
+        cardUid: "6665455613",
+        name: "Spy",
+        hp: 2,
+        power: 0,
+        cost: 0,
+        aspectCost: [],
+        ownerID: "",
+        damage: 0,
+        ready: false,
+        imgURL: "https://starwarsunlimited.com/_next/image?url=https%3A%2F%2Fcdn.starwarsunlimited.com%2F%2F06010_T01_EN_Spy_548cb6c8ab.png&w=640&q=75",
+        controllerID: "0",
+        buffs: [],
+        upgrades: [],
+        keywords: [
+            {
+                keyword: 0,//Keyword.RAID,
+                number: 2
+            }
+        ],
+        arena: Arena.GROUND,
+        traits: ["Official"],
+        cardType: CardType.TOKEN_UNIT,
+        upgradePower: 0,
+        upgradeHp: 0,
     },
 }
 
@@ -226,7 +270,7 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | CardEve
         console.log("Data is null...?")
         return null
     }
-    if (data.attributes.type.data.attributes.name == "Event") {
+    if (data.attributes.type.data.attributes.name == "Event" || data.attributes.type.data.attributes.name == "Upgrade") {
         let card: CardEvent = {
             cardID: 0,
             cardUid: cardUid,
@@ -238,7 +282,11 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | CardEve
             ownerID: "",
             imgURL: data.attributes.artFront.data.attributes.formats.card.url,
             controllerID: "0",
-            keywords: []
+            keywords: [],
+            traits: data.attributes.traits.data.map((item: any) => item.attributes.name),
+            cardType: data.attributes.type.data.attributes.name,
+            upgradePower: data.attributes.upgradeHp || 0,
+            upgradeHp: data.attributes.upgradePower || 0,
         }
         if (cardUid in CardIDKeywords) {
             for (let cardKeyword of CardIDKeywords[cardUid]!) {
@@ -262,7 +310,11 @@ export async function createCard(cardUid: CardUID): Promise<CardActive | CardEve
         controllerID: "0",
         buffs: [],
         upgrades: [],
-        keywords: []
+        keywords: [],
+        traits: data.attributes.traits.data.map((item: any) => item.attributes.name),
+        cardType: CardType.UNIT,
+        upgradePower: data.attributes.upgradeHp || 0,
+        upgradeHp: data.attributes.upgradePower || 0,
     }
     if (cardUid in CardIDKeywords) {
         for (let cardKeyword of CardIDKeywords[cardUid]!) {

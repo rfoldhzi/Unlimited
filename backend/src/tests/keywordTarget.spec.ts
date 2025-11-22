@@ -1,7 +1,7 @@
 // import { beforeEach, describe } from "node:test";
 import { GameClass } from "../logic/gameClass";
 import * as game from "./sampleGames/keywordTarget.json"
-import { Aspect, CardActive, Game } from "../models/game";
+import { Aspect, CardActive, CardType, Game } from "../models/game";
 import * as GameHandler from "../logic/gameHandler"
 import { Keyword } from "../logic/abilities";
 
@@ -44,7 +44,9 @@ describe('Explot Ambush Target Test', () => {
                 ready: false,
                 buffs: [],
                 cardID: 0,
-                upgrades: []
+                upgrades: [],
+                traits: [],
+                cardType: CardType.UNIT
             }
             return card
         })
@@ -81,7 +83,9 @@ describe('Explot Ambush Target Test', () => {
                 ready: false,
                 buffs: [],
                 cardID: 0,
-                upgrades: []
+                upgrades: [],
+                traits: [],
+                cardType: CardType.UNIT
             }
             return card
         })
